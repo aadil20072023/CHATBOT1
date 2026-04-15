@@ -919,7 +919,7 @@ function Sidebar({ meUser, conversations, activeConvId, onSelect, onNewChat, onL
 
       {/* Tabs */}
       <div className="sidebar-tabs">
-        {['Chats', 'Status', 'Calls', 'Admin'].map(t => (
+        {(window.location.hash === '#admin' || window.location.search.includes('admin=true') ? ['Chats', 'Status', 'Calls', 'Admin'] : ['Chats', 'Status', 'Calls']).map(t => (
           <button
             key={t}
             className={`tab-btn ${finalTab === t ? 'active' : ''}`}
