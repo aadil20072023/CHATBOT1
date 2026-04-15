@@ -348,3 +348,43 @@ export function subscribeStatuses(callback) {
      callback(finalGroups);
   });
 }
+// ── Calls ─────────────────────────────────────────────
+
+export async function initiateCall(fromId, toId, type = 'voice') {
+  const call = {
+    fromId,
+    toId,
+    type,
+    status: 'ringing',
+    roomId: `call_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    ts: Date.now()
+  };
+  const docRef = await addDoc(collection(db, 'calls'), call);
+  return { id: docRef.id, ...call };
+}
+
+export async function acceptCall(callId) {
+  await updateDoc(doc(db, 'calls', callId), { status: 'ongoing' });
+}
+
+export async function endCall(callId) {
+  await updateDoc(doc(db, 'calls', callId), { status: 'ended', endedAt: Date.now() });
+}
+
+export function subscribeCalls(userId, callback) {
+  const q = query(collection(db, 'calls'), where('toId', '==', userId), where('status', '==', 'ringing'));
+  return onSnapshot(q, (snap) => {
+    const activeCalls = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    if (activeCalls.length > 0) {
+      callback(activeCalls[activeCalls.length - 1]);
+    } else {
+      callback(null);
+    }
+  });
+}
+
+export function subscribeCallState(callId, callback) {
+  return onSnapshot(doc(db, 'calls', callId), (d) => {
+    if (d.exists()) callback(d.data());
+  });
+}

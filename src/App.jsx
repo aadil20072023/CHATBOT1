@@ -7,7 +7,7 @@ import {
   markConvRead, deleteMessage, subscribeMessages,
   addStatus, subscribeStatuses,
   setTypingStatus, subscribeTypingStatus, getAllUsers,
-  updateProfile
+  updateProfile, initiateCall, acceptCall, endCall, subscribeCalls, subscribeCallState
 } from './auth.js';
 import { EMOJIS } from './data.js';
 import emailjs from '@emailjs/browser';
@@ -452,7 +452,7 @@ function MessageBubble({ msg, contactUser, meUser, onContextMenu }) {
 }
 
 // ─── Chat Area ────────────────────────────────────────────────────────────────
-function ChatArea({ convId, contactUser, meUser, showInfo, setShowInfo, onBack }) {
+function ChatArea({ convId, contactUser, meUser, showInfo, setShowInfo, onBack, onCall }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [replyTo, setReplyTo] = useState(null);
@@ -623,8 +623,8 @@ function ChatArea({ convId, contactUser, meUser, showInfo, setShowInfo, onBack }
         </div>
         
         <div className="chat-header-actions" style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-          <button className="icon-btn" title="Video Call"><Video size={20} /></button>
-          <button className="icon-btn" title="Voice Call"><Phone size={18} /></button>
+          <button className="icon-btn" title="Video Call" onClick={() => onCall('video')}><Video size={20} /></button>
+          <button className="icon-btn" title="Voice Call" onClick={() => onCall('voice')}><Phone size={18} /></button>
           <button
             className="icon-btn"
             onClick={() => setShowInfo(v => !v)}
@@ -1238,6 +1238,56 @@ function WelcomeScreen({ meUser, onNewChat }) {
   );
 }
 
+// ─── Calling ──────────────────────────────────────────────────────────────────
+
+function IncomingCallModal({ call, onAccept, onReject }) {
+  const [caller, setCaller] = useState(null);
+  useEffect(() => {
+    import('./auth.js').then(m => m.getUserById(call.fromId)).then(u => setCaller(u));
+  }, [call.fromId]);
+
+  if (!caller) return null;
+
+  return (
+    <div className="modal-overlay" style={{ zIndex: 10000, background: 'rgba(0,0,0,0.9)', backdropFilter: 'blur(20px)' }}>
+      <div className="modal incoming-call-card" style={{ maxWidth: 360, textAlign: 'center', padding: 40, background: 'transparent', border: 'none' }}>
+        <div style={{ position: 'relative', marginBottom: 30, display: 'flex', justifyContent: 'center' }}>
+           <Avatar user={caller} size={120} />
+        </div>
+        <h2 style={{ fontSize: 28, fontWeight: 800, marginBottom: 8, color: 'white' }}>{caller.name}</h2>
+        <p style={{ color: 'rgba(255,255,255,0.6)', marginBottom: 40, fontSize: 16 }}>Incoming {call.type} call...</p>
+        <div style={{ display: 'flex', gap: 20, justifyContent: 'center' }}>
+          <button onClick={onReject} className="icon-btn" style={{ width: 64, height: 64, background: '#ff4b5c', color: 'white' }}><X size={32} /></button>
+          <button onClick={onAccept} className="icon-btn" style={{ width: 64, height: 64, background: '#43e97b', color: 'white' }}><Phone size={32} /></button>
+        </div>
+        <audio autoPlay loop src="https://assets.mixkit.co/active_storage/sfx/1359/1359-preview.mp3" />
+      </div>
+    </div>
+  );
+}
+
+function OngoingCallWindow({ call, meUser, onEnd }) {
+  const roomName = `ChatterBox_${call.roomId}`;
+  const jitsiUrl = `https://meet.jit.si/${roomName}#config.prejoinPageEnabled=false&userInfo.displayName="${meUser.name}"`;
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 10001, background: '#000', display: 'flex', flexDirection: 'column' }}>
+       <div style={{ height: 60, background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+             <Phone size={18} color="var(--accent-primary)" />
+             <span style={{ fontSize: 14, fontWeight: 600, color: 'white' }}>{call.type === 'video' ? 'Video Call' : 'Voice Call'}</span>
+          </div>
+          <button onClick={onEnd} style={{ padding: '8px 20px', background: '#ff4b5c', border: 'none', borderRadius: 8, color: '#fff', fontWeight: 700, cursor: 'pointer' }}>End Call</button>
+       </div>
+       <iframe 
+         src={jitsiUrl} 
+         style={{ flex: 1, border: 'none' }} 
+         allow="camera; microphone; fullscreen; display-capture; autoplay"
+       />
+    </div>
+  );
+}
+
 // ─── App ──────────────────────────────────────────────────────────────────────
 export default function App() {
   const [meUser, setMeUser] = useState(() => getSession());
@@ -1250,6 +1300,8 @@ export default function App() {
   const [showInfo, setShowInfo] = useState(false);
   const [viewingStatusGroup, setViewingStatusGroup] = useState(null);
   const [toast, setToast] = useState(null);
+  const [incomingCall, setIncomingCall] = useState(null);
+  const [activeCall, setActiveCall] = useState(null);
 
   const showToast = (t) => { setToast(t); setTimeout(() => setToast(null), 3000); };
 
@@ -1257,11 +1309,40 @@ export default function App() {
     if (!meUser) return;
     const unsubConvs = subscribeConversations(meUser.id, setConversations);
     const unsubStats = subscribeStatuses(setStatuses);
+    const unsubCalls = subscribeCalls(meUser.id, (call) => {
+       if (call && !activeCall) setIncomingCall(call);
+    });
     return () => {
        unsubConvs();
        unsubStats();
+       unsubCalls();
     };
-  }, [meUser]);
+  }, [meUser, activeCall]);
+
+  useEffect(() => {
+    if (activeCall) {
+       const unsub = subscribeCallState(activeCall.id, (state) => {
+          if (state.status === 'ended') setActiveCall(null);
+       });
+       return unsub;
+    }
+  }, [activeCall]);
+
+  const handleStartCall = async (toUserId, type) => {
+    const call = await initiateCall(meUser.id, toUserId, type);
+    setActiveCall(call);
+  };
+
+  const handleAcceptCall = async () => {
+    await acceptCall(incomingCall.id);
+    setActiveCall(incomingCall);
+    setIncomingCall(null);
+  };
+
+  const handleEndCall = async () => {
+    if (activeCall) await endCall(activeCall.id);
+    setActiveCall(null);
+  };
 
   // Handle unload hook manually (removed setOnlineStatus call as Firebase handles it differently or would need async unload)
   useEffect(() => {
@@ -1352,11 +1433,28 @@ export default function App() {
           showInfo={showInfo}
           setShowInfo={setShowInfo}
           onBack={() => setActiveConv(null)}
+          onCall={(type) => handleStartCall(activeConv.contact.id, type)}
         />
       ) : (
         <div className={`chat-area mobile-hidden-welcome`}>
           <WelcomeScreen meUser={meUser} onNewChat={() => setShowNewChat(true)} />
         </div>
+      )}
+
+      {incomingCall && (
+        <IncomingCallModal 
+          call={incomingCall} 
+          onAccept={handleAcceptCall} 
+          onReject={() => setIncomingCall(null)} 
+        />
+      )}
+
+      {activeCall && (
+        <OngoingCallWindow 
+          call={activeCall} 
+          meUser={meUser} 
+          onEnd={handleEndCall} 
+        />
       )}
 
       {viewingStatusGroup && (
