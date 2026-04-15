@@ -1323,16 +1323,7 @@ body {
   object-fit: cover;
 }
 
-/* ====== RESPONSIVE ====== */
-@media (max-width: 900px) {
-  .info-panel { display: none; }
-  .sidebar { width: 300px; }
-  .chat-bg { padding: 16px 20px; }
-}
-
-@media (max-width: 640px) {
-  .sidebar { display: none; }
-}
+/* Legacy responsive rules removed in favor of new mobile logic at the bottom of file */
 
 /* ====== AUTH PAGE ====== */
 .auth-page {
