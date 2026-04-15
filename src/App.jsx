@@ -16,7 +16,7 @@ import {
   MoreVertical, Smile, Paperclip, Mic, Square, Send, X, 
   RotateCcw, Copy, Star, Forward, Trash2, Home, Settings,
   CheckCheck, Info, Monitor, Zap, Plus, Play, Pause, AlertCircle,
-  Menu, User
+  Menu, User, Lock, Mail
 } from 'lucide-react';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -385,7 +385,7 @@ function InfoPanel({ user, onClose }) {
           <span className="info-row-text">@{user.username || 'user'}</span>
         </div>
         <div className="info-row">
-          <span className="info-row-icon">✉️</span>
+          <span className="info-row-icon"><Mail size={16} /></span>
           <span className="info-row-text">{user.email}</span>
         </div>
       </div>
@@ -801,7 +801,9 @@ function StatusViewer({ groupedStatuses, meUser, onClose, onAddStatus }) {
               <div style={{ fontSize: 12, opacity: 0.8 }}>{new Date(status.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
             </div>
           </div>
-          <button onClick={() => setViewingUserIdx(-1)} style={{ background: 'none', border: 'none', color: '#fff', fontSize: 24, cursor: 'pointer' }}>✕</button>
+          <button onClick={() => setViewingUserIdx(-1)} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <X size={28} />
+          </button>
         </div>
         {/* Content */}
         <div style={{ flex: 1, background: status.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 40, cursor: 'pointer' }} onClick={() => {
@@ -819,7 +821,7 @@ function StatusViewer({ groupedStatuses, meUser, onClose, onAddStatus }) {
     <div className="chat-area" style={{ background: 'var(--bg-secondary)', display: 'flex', flexDirection: 'column' }}>
       <div className="chat-header" style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg-tertiary)' }}>
         <h2 style={{ fontSize: 18, margin: 0 }}>Status</h2>
-        <button onClick={onClose} className="icon-btn">✕</button>
+        <button onClick={onClose} className="icon-btn"><X size={20} /></button>
       </div>
       <div style={{ flex: 1, overflowY: 'auto', padding: 20 }}>
         {adding ? (
@@ -1167,7 +1169,7 @@ function WelcomeScreen({ meUser, onNewChat }) {
           <MessageCircle size={54} color="white" />
         </div>
         <div style={{ marginTop: 20 }}>
-          <h2 style={{ fontSize: 36, fontWeight: 800, marginBottom: 8, fontFamily: "'Outfit', sans-serif" }}>Welcome, {meUser.name.split(' ')[0]}!</h2>
+          <h2 style={{ fontSize: 36, fontWeight: 800, marginBottom: 8, fontFamily: "'Outfit', sans-serif" }}>Welcome, {meUser?.name ? meUser.name.split(' ')[0] : 'User'}!</h2>
           <p style={{ fontSize: 16, color: 'var(--text-secondary)', maxWidth: 400, margin: '0 auto' }}>Ready to connect with your world? Start a conversation now.</p>
         </div>
         
