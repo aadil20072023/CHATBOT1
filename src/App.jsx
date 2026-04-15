@@ -602,28 +602,27 @@ function ChatArea({ convId, contactUser, meUser, showInfo, setShowInfo, onBack }
   return (
     <div className={`chat-area ${!convId ? 'hidden' : ''}`} style={{ display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
-      <div className="chat-header">
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
-          <button className="icon-btn back-btn" onClick={onBack} title="Back"><ArrowLeft size={20} /></button>
-          <div 
-            style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', minWidth: 0 }} 
-            onClick={() => setShowInfo(true)}
-          >
-            <OnlineAvatar user={contactUser} size={40} borderColor="var(--bg-secondary)" />
-            <div className="chat-header-info">
-              <div className="chat-header-name">{contactUser.name}</div>
-              <div className="chat-header-sub">
-                {isTyping ? (
-                  <span style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>typing...</span>
-                ) : contactUser.online ? (
-                  <span style={{ color: 'var(--accent-primary)' }}>Online</span>
-                ) : 'Offline'}
-              </div>
+      <div className="chat-header" style={{ display: 'grid', gridTemplateColumns: 'auto 1fr auto', alignItems: 'center', gap: 12 }}>
+        <button className="icon-btn back-btn" onClick={onBack} title="Back" style={{ marginRight: -4 }}><ArrowLeft size={22} /></button>
+        
+        <div 
+          style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer', minWidth: 0 }} 
+          onClick={() => setShowInfo(true)}
+        >
+          <div style={{ flexShrink: 0 }}><OnlineAvatar user={contactUser} size={40} borderColor="var(--bg-secondary)" /></div>
+          <div className="chat-header-info" style={{ minWidth: 0 }}>
+            <div className="chat-header-name">{contactUser.name}</div>
+            <div className="chat-header-sub">
+              {isTyping ? (
+                <span style={{ color: 'var(--accent-primary)', fontWeight: 700 }}>typing...</span>
+              ) : contactUser.online ? (
+                <span style={{ color: 'var(--accent-primary)', display: 'flex', alignItems: 'center', gap: 4 }}>Online</span>
+              ) : 'Offline'}
             </div>
           </div>
         </div>
         
-        <div className="chat-header-actions">
+        <div className="chat-header-actions" style={{ display: 'flex', alignItems: 'center', gap: 4, flexShrink: 0 }}>
           <button className="icon-btn" title="Video Call"><Video size={20} /></button>
           <button className="icon-btn" title="Voice Call"><Phone size={18} /></button>
           <button
