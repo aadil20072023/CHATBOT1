@@ -9,6 +9,7 @@ import {
   setTypingStatus, subscribeTypingStatus, getAllUsers
 } from './auth.js';
 import { EMOJIS } from './data.js';
+import emailjs from '@emailjs/browser';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -989,10 +990,46 @@ function Sidebar({ meUser, conversations, activeConvId, onSelect, onNewChat, onL
 // ─── External Admin Dashboard ────────────────────────────────────────────────────────
 function AdminExternalPanel({ currentUserId, onLogout }) {
   const [users, setUsers] = useState([]);
+  const [draftUser, setDraftUser] = useState(null);
+  const [emailSubject, setEmailSubject] = useState('Message from ChatterBox Admin');
+  const [emailBody, setEmailBody] = useState('');
+  const [isSending, setIsSending] = useState(false);
+  const [sendError, setSendError] = useState('');
+  const [sendSuccess, setSendSuccess] = useState(false);
   
   useEffect(() => {
     import('./auth.js').then(m => m.getAllUsers()).then(res => setUsers(res));
   }, []);
+
+  const handleSendEmailJS = async (e) => {
+    e.preventDefault();
+    setIsSending(true);
+    setSendError('');
+    setSendSuccess(false);
+
+    try {
+      // TO DO: Replace these strings with your actual EmailJS credentials
+      const SERVICE_ID = 'YOUR_SERVICE_ID';
+      const TEMPLATE_ID = 'YOUR_TEMPLATE_ID';
+      const PUBLIC_KEY = 'YOUR_PUBLIC_KEY';
+
+      const templateParams = {
+        to_name: draftUser.name,
+        to_email: draftUser.email,
+        subject: emailSubject,
+        message: emailBody,
+      };
+
+      await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY);
+      setSendSuccess(true);
+      setTimeout(() => setDraftUser(null), 2000); // close modal after 2s
+    } catch (err) {
+      setSendError('Failed to send email. Ensure you have entered your YOUR_SERVICE_ID etc. in the code!');
+      console.error(err);
+    } finally {
+      setIsSending(false);
+    }
+  };
 
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column', color: 'var(--text-primary)' }}>
@@ -1021,18 +1058,62 @@ function AdminExternalPanel({ currentUserId, onLogout }) {
                       </div>
                    </div>
                    <div style={{ display: 'flex', gap: 10 }}>
-                     <a 
-                       href={`mailto:${u.email}?subject=Message from ChatterBox Admin`} 
-                       style={{ background: 'var(--accent-primary)', color: '#fff', textDecoration: 'none', padding: '8px 16px', borderRadius: 8, fontWeight: 600, fontSize: 14 }}
+                     <button 
+                       onClick={() => { setDraftUser(u); setSendSuccess(false); setSendError(''); setEmailBody(''); }}
+                       style={{ background: 'var(--accent-primary)', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: 8, fontWeight: 600, fontSize: 14, cursor: 'pointer' }}
                      >
                        ✉️ Send Email
-                     </a>
+                     </button>
                    </div>
                  </div>
                ))}
             </div>
          </div>
       </main>
+
+      {/* Email Draft Modal */}
+      {draftUser && (
+        <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) setDraftUser(null); }}>
+          <div className="modal" style={{ maxWidth: 500, width: '100%' }}>
+            <div className="modal-header">
+              <button className="icon-btn" onClick={() => setDraftUser(null)}>✕</button>
+              <span className="modal-title">Draft Email to {draftUser.name}</span>
+            </div>
+            <form className="modal-body" onSubmit={handleSendEmailJS}>
+              <div className="auth-field" style={{ marginBottom: 16 }}>
+                <label className="auth-label">To Email</label>
+                <input className="auth-input" value={draftUser.email} disabled style={{ opacity: 0.7 }} />
+              </div>
+              <div className="auth-field" style={{ marginBottom: 16 }}>
+                <label className="auth-label">Subject</label>
+                <input className="auth-input" value={emailSubject} onChange={e => setEmailSubject(e.target.value)} required />
+              </div>
+              <div className="auth-field" style={{ marginBottom: 16 }}>
+                <label className="auth-label">Message Body</label>
+                <textarea 
+                  className="auth-input" 
+                  value={emailBody} 
+                  onChange={e => setEmailBody(e.target.value)} 
+                  required 
+                  rows={6}
+                  style={{ resize: 'vertical', minHeight: 100, padding: 12 }}
+                />
+              </div>
+
+              {sendError && <div className="auth-error" style={{ marginBottom: 16 }}><span>⚠️</span> {sendError}</div>}
+              {sendSuccess && <div style={{ color: 'var(--accent-primary)', padding: 12, background: 'rgba(37,211,102,0.1)', borderRadius: 8, marginBottom: 16, fontWeight: 600 }}>✅ Email sent successfully via EmailJS!</div>}
+
+              <button 
+                type="submit" 
+                disabled={isSending || sendSuccess} 
+                style={{ width: '100%', padding: 14, borderRadius: 8, background: 'var(--accent-primary)', color: '#fff', border: 'none', fontWeight: 600, fontSize: 16, cursor: isSending ? 'not-allowed' : 'pointer', opacity: isSending ? 0.7 : 1 }}
+              >
+                {isSending ? 'Sending...' : 'Send Delivery Email'}
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
