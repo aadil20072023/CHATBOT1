@@ -310,6 +310,10 @@ body {
 }
 
 /* Tabs */
+.sidebar-tabs {
+  display: flex;
+  padding: 0 16px;
+  gap: 4px;
   border-bottom: 1px solid var(--border);
 }
 
