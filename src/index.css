@@ -600,12 +600,12 @@ body {
 }
 
 .chat-header-name {
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 700;
   color: var(--text-primary);
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .group-badge {
@@ -619,12 +619,11 @@ body {
 }
 
 .chat-header-sub {
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin-top: 2px;
-  display: flex;
-  align-items: center;
-  gap: 4px;
+  font-size: 11px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .typing-dots {

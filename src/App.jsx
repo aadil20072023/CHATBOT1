@@ -589,28 +589,33 @@ function ChatArea({ convId, contactUser, meUser, showInfo, setShowInfo, onBack }
     <div className={`chat-area ${!convId ? 'hidden' : ''}`}>
       {/* Header */}
       <div className="chat-header">
-        <button className="icon-btn back-btn" onClick={onBack}><ArrowLeft size={20} /></button>
-        <OnlineAvatar user={contactUser} size={42} borderColor="var(--bg-secondary)" />
-        <div className="chat-header-info">
-          <div className="chat-header-name">{contactUser.name}</div>
-          <div className="chat-header-sub">
-            {isTyping ? (
-              <>
-                <span style={{ color: 'var(--accent-primary)' }}>typing</span>
-                <div className="typing-dots">
-                  <div className="typing-dot" /><div className="typing-dot" /><div className="typing-dot" />
-                </div>
-              </>
-            ) : contactUser.online ? '🟢 Online' : '⚫ Offline'}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
+          <button className="icon-btn back-btn" onClick={onBack} title="Back"><ArrowLeft size={20} /></button>
+          <div 
+            style={{ display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', minWidth: 0 }} 
+            onClick={() => setShowInfo(true)}
+          >
+            <OnlineAvatar user={contactUser} size={40} borderColor="var(--bg-secondary)" />
+            <div className="chat-header-info">
+              <div className="chat-header-name">{contactUser.name}</div>
+              <div className="chat-header-sub">
+                {isTyping ? (
+                  <span style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>typing...</span>
+                ) : contactUser.online ? (
+                  <span style={{ color: 'var(--accent-primary)' }}>Online</span>
+                ) : 'Offline'}
+              </div>
+            </div>
           </div>
         </div>
+        
         <div className="chat-header-actions">
-          <button className="icon-btn" title="Video call"><Video size={20} /></button>
-          <button className="icon-btn" title="Voice call"><Phone size={20} /></button>
+          <button className="icon-btn" title="Video Call"><Video size={20} /></button>
+          <button className="icon-btn" title="Voice Call"><Phone size={18} /></button>
           <button
             className="icon-btn"
             onClick={() => setShowInfo(v => !v)}
-            title="Contact info"
+            title="Contact Info"
             style={showInfo ? { background: 'var(--accent-glow)', color: 'var(--accent-primary)' } : {}}
           ><MoreVertical size={20} /></button>
         </div>
