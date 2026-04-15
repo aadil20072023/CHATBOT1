@@ -1827,6 +1827,37 @@ body {
   .chat-avatar-sm {
     display: none;
   }
+  
+  /* Mobile Chat Area Tuning */
+  .chat-header {
+    padding: 10px 14px;
+    gap: 10px;
+  }
+  .chat-bg {
+    padding: 12px 14px;
+  }
+  .input-area {
+    padding: 10px 12px;
+  }
+  .input-row {
+    gap: 8px;
+  }
+  .msg-bubble-group {
+    max-width: 85%;
+  }
+  .msg-bubble {
+    padding: 10px 14px;
+    font-size: 14px;
+  }
+  .sidebar-header {
+    padding: 14px 16px;
+  }
+  .my-status-bar {
+    padding: 10px 16px;
+  }
+  .search-wrapper {
+    padding: 10px 14px;
+  }
 }
 
 /* Animations */
