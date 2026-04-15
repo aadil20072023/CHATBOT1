@@ -585,8 +585,22 @@ function ChatArea({ convId, contactUser, meUser, showInfo, setShowInfo, onBack }
     grouped.push({ type: 'msg', msg });
   });
 
+  if (!contactUser) {
+    return (
+      <div className="chat-area">
+        <div className="chat-header">
+           <button className="icon-btn" onClick={onBack}><ArrowLeft size={20} /></button>
+           <div className="chat-header-name">Conversation</div>
+        </div>
+        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
+          Loading conversation details...
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className={`chat-area ${!convId ? 'hidden' : ''}`}>
+    <div className={`chat-area ${!convId ? 'hidden' : ''}`} style={{ display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
       <div className="chat-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, flex: 1, minWidth: 0 }}>
