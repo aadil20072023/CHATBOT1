@@ -114,6 +114,19 @@ body {
   position: relative;
   z-index: 1;
   flex-shrink: 0;
+  transition: transform 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    position: absolute;
+    inset: 0;
+    z-index: 100;
+  }
+  .sidebar.hidden {
+    transform: translateX(-100%);
+  }
 }
 
 /* Sidebar Header */
@@ -297,11 +310,24 @@ body {
 }
 
 /* Tabs */
-.sidebar-tabs {
-  display: flex;
-  padding: 0 16px;
-  gap: 4px;
   border-bottom: 1px solid var(--border);
+}
+
+@media (max-width: 768px) {
+  .sidebar-tabs {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-tertiary);
+    border-top: 1px solid var(--border);
+    border-bottom: none;
+    padding-bottom: env(safe-area-inset-bottom);
+    z-index: 1000;
+  }
+  .chat-list {
+    margin-bottom: 70px;
+  }
 }
 
 .tab-btn {
@@ -470,9 +496,19 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
+  background: var(--bg-primary);
   position: relative;
-  z-index: 1;
-  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .chat-area {
+    position: absolute;
+    inset: 0;
+    z-index: 200;
+  }
+  .chat-area.hidden {
+    display: none;
+  }
 }
 
 /* Welcome screen */
@@ -1772,3 +1808,38 @@ body {
   margin-bottom: 8px;
 }
 
+.back-btn {
+  display: none;
+  margin-right: 12px;
+}
+
+@media (max-width: 768px) {
+  .back-btn {
+    display: flex;
+  }
+  .mobile-hidden-welcome {
+    display: none !important;
+  }
+  .info-panel {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100% !important;
+    z-index: 1000;
+  }
+  .chat-avatar-sm {
+    display: none;
+  }
+}
+
+/* Animations */
+@keyframes slideIn {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.chat-area:not(.hidden) {
+  animation: slideIn 0.3s ease-out;
+}

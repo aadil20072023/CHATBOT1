@@ -16,7 +16,7 @@ import {
   MoreVertical, Smile, Paperclip, Mic, Square, Send, X, 
   RotateCcw, Copy, Star, Forward, Trash2, Home, Settings,
   CheckCheck, Info, Monitor, Zap, Plus, Play, Pause, AlertCircle,
-  Menu, User, Lock, Mail
+  Menu, User, Lock, Mail, ArrowLeft
 } from 'lucide-react';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -586,9 +586,10 @@ function ChatArea({ convId, contactUser, meUser, showInfo, setShowInfo, onBack }
   });
 
   return (
-    <div className="chat-area">
+    <div className={`chat-area ${!convId ? 'hidden' : ''}`}>
       {/* Header */}
       <div className="chat-header">
+        <button className="icon-btn back-btn" onClick={onBack}><ArrowLeft size={20} /></button>
         <OnlineAvatar user={contactUser} size={42} borderColor="var(--bg-secondary)" />
         <div className="chat-header-info">
           <div className="chat-header-name">{contactUser.name}</div>
@@ -878,7 +879,7 @@ function StatusViewer({ groupedStatuses, meUser, onClose, onAddStatus }) {
 }
 
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
-function Sidebar({ meUser, conversations, activeConvId, onSelect, onNewChat, onLogout, activeTab, setActiveTab, onOpenProfile }) {
+function Sidebar({ meUser, conversations, activeConvId, onSelect, onNewChat, onLogout, activeTab, setActiveTab, onOpenProfile, isHidden }) {
   const [search, setSearch] = useState('');
   const [activeTabLocal, setActiveTabLocal] = useState('Chats');
   const finalTab = activeTab || activeTabLocal;
@@ -890,7 +891,7 @@ function Sidebar({ meUser, conversations, activeConvId, onSelect, onNewChat, onL
   );
 
   return (
-    <div className="sidebar">
+    <div className={`sidebar ${isHidden ? 'hidden' : ''}`}>
       {/* Header */}
       <div className="sidebar-header">
         <div className="sidebar-brand">
@@ -1163,50 +1164,48 @@ function AdminExternalPanel({ currentUserId, onLogout }) {
 // ─── Welcome ──────────────────────────────────────────────────────────────────
 function WelcomeScreen({ meUser, onNewChat }) {
   return (
-    <div className="chat-area" style={{ background: 'radial-gradient(circle at center, var(--bg-hover) 0%, var(--bg-primary) 100%)' }}>
-      <div className="welcome-screen" style={{ padding: '60px' }}>
-        <div className="welcome-icon" style={{ width: 120, height: 120, border: '4px solid rgba(255,255,255,0.05)' }}>
-          <MessageCircle size={54} color="white" />
-        </div>
-        <div style={{ marginTop: 20 }}>
-          <h2 style={{ fontSize: 36, fontWeight: 800, marginBottom: 8, fontFamily: "'Outfit', sans-serif" }}>Welcome, {meUser?.name ? meUser.name.split(' ')[0] : 'User'}!</h2>
-          <p style={{ fontSize: 16, color: 'var(--text-secondary)', maxWidth: 400, margin: '0 auto' }}>Ready to connect with your world? Start a conversation now.</p>
-        </div>
-        
-        <div className="welcome-dots" style={{ margin: '20px 0' }}>
-          <div className="welcome-dot" /><div className="welcome-dot" /><div className="welcome-dot" />
-        </div>
+    <div className="welcome-screen" style={{ padding: '60px' }}>
+      <div className="welcome-icon" style={{ width: 120, height: 120, border: '4px solid rgba(255,255,255,0.05)' }}>
+        <MessageCircle size={54} color="white" />
+      </div>
+      <div style={{ marginTop: 20 }}>
+        <h2 style={{ fontSize: 36, fontWeight: 800, marginBottom: 8, fontFamily: "'Outfit', sans-serif" }}>Welcome, {meUser?.name ? meUser.name.split(' ')[0] : 'User'}!</h2>
+        <p style={{ fontSize: 16, color: 'var(--text-secondary)', maxWidth: 400, margin: '0 auto' }}>Ready to connect with your world? Start a conversation now.</p>
+      </div>
+      
+      <div className="welcome-dots" style={{ margin: '20px 0' }}>
+        <div className="welcome-dot" /><div className="welcome-dot" /><div className="welcome-dot" />
+      </div>
 
-        <button
-          onClick={onNewChat}
-          style={{
-            marginTop: 10, padding: '18px 42px', borderRadius: 20,
-            background: 'var(--bubble-out)',
-            border: 'none', color: '#fff', fontSize: 16, fontWeight: 800,
-            fontFamily: "'Outfit', sans-serif", cursor: 'pointer', boxShadow: 'var(--shadow-glow)',
-            transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)'
-          }}
-          className="welcome-primary-btn"
-        >
-          Start New Chat
-        </button>
+      <button
+        onClick={onNewChat}
+        style={{
+          marginTop: 10, padding: '18px 42px', borderRadius: 20,
+          background: 'var(--bubble-out)',
+          border: 'none', color: '#fff', fontSize: 16, fontWeight: 800,
+          fontFamily: "'Outfit', sans-serif", cursor: 'pointer', boxShadow: 'var(--shadow-glow)',
+          transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)'
+        }}
+        className="welcome-primary-btn"
+      >
+        Start New Chat
+      </button>
 
-        <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', justifyContent: 'center', marginTop: 30 }}>
-          {[
-            { icon: <Lock size={14} />, label: 'Secured Encryption' },
-            { icon: <Zap size={14} />, label: 'Fast Delivery' },
-            { icon: <Monitor size={14} />, label: 'Real-time Online' }
-          ].map(f => (
-            <span key={f.label} style={{
-              background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)',
-              borderRadius: 14, padding: '10px 18px',
-              fontSize: 13, color: 'var(--text-muted)', fontWeight: 600,
-              display: 'flex', alignItems: 'center', gap: 8
-            }}>
-              {f.icon} {f.label}
-            </span>
-          ))}
-        </div>
+      <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', justifyContent: 'center', marginTop: 30 }}>
+        {[
+          { icon: <Lock size={14} />, label: 'Secured Encryption' },
+          { icon: <Zap size={14} />, label: 'Fast Delivery' },
+          { icon: <Monitor size={14} />, label: 'Real-time Online' }
+        ].map(f => (
+          <span key={f.label} style={{
+            background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)',
+            borderRadius: 14, padding: '10px 18px',
+            fontSize: 13, color: 'var(--text-muted)', fontWeight: 600,
+            display: 'flex', alignItems: 'center', gap: 8
+          }}>
+            {f.icon} {f.label}
+          </span>
+        ))}
       </div>
     </div>
   );
@@ -1297,6 +1296,7 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onOpenProfile={() => setShowProfileSettings(true)}
+        isHidden={!!activeConv || activeTab === 'Status'}
       />
 
       {activeTab === 'Status' ? (
@@ -1314,9 +1314,12 @@ export default function App() {
           meUser={meUser}
           showInfo={showInfo}
           setShowInfo={setShowInfo}
+          onBack={() => setActiveConv(null)}
         />
       ) : (
-        <WelcomeScreen meUser={meUser} onNewChat={() => setShowNewChat(true)} />
+        <div className="chat-area mobile-hidden-welcome">
+          <WelcomeScreen meUser={meUser} onNewChat={() => setShowNewChat(true)} />
+        </div>
       )}
 
       {showInfo && activeConv && (
