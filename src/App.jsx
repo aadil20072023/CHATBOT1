@@ -742,126 +742,99 @@ function ChatArea({ convId, contactUser, meUser, showInfo, setShowInfo, onBack }
 }
 
 // ─── Status Viewer ─────────────────────────────────────────────────────────────
-function StatusViewer({ groupedStatuses, meUser, onClose, onAddStatus }) {
+function StatusView({ group, meUser, onClose, onFinish }) {
+  const [idx, setIdx] = useState(0);
+  const total = group.statuses.length;
+  const status = group.statuses[idx];
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (idx < total - 1) setIdx(i => i + 1);
+      else onFinish();
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [idx, total, onFinish]);
+
+  if (!status) return null;
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: '#000', zIndex: 9999, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', gap: 4, padding: '10px 10px 0 10px', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10 }}>
+        {group.statuses.map((s, i) => (
+          <div key={s.id} style={{ flex: 1, height: 3, background: 'rgba(255,255,255,0.3)', borderRadius: 2, overflow: 'hidden' }}>
+            <div style={{ height: '100%', background: '#fff', width: i < idx ? '100%' : i === idx ? '100%' : '0%', transition: i === idx ? 'width 4s linear' : 'none' }} />
+          </div>
+        ))}
+      </div>
+      <div style={{ position: 'absolute', top: 16, left: 16, right: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 10 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <Avatar user={group.user} size={40} />
+          <div style={{ color: '#fff' }}>
+            <div style={{ fontWeight: 600, fontSize: 15 }}>{group.user.id === meUser.id ? 'My Status' : group.user.name}</div>
+            <div style={{ fontSize: 12, opacity: 0.8 }}>{new Date(status.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+          </div>
+        </div>
+        <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <X size={28} />
+        </button>
+      </div>
+      <div style={{ flex: 1, background: status.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 40, cursor: 'pointer' }} onClick={() => {
+         if (idx < total - 1) setIdx(i => i + 1);
+         else onFinish();
+      }}>
+        <h1 style={{ color: '#fff', fontSize: 36, textAlign: 'center', textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>{status.text}</h1>
+      </div>
+    </div>
+  );
+}
+
+function StatusPage({ groupedStatuses, meUser, onAddStatus, onViewStatus }) {
   const [adding, setAdding] = useState(false);
   const [text, setText] = useState('');
-  const [viewingUserIdx, setViewingUserIdx] = useState(-1);
-  const [viewingStatusIdx, setViewingStatusIdx] = useState(0);
-
-  // Auto-advance
-  useEffect(() => {
-    if (viewingUserIdx < 0) return;
-    const currentGroup = groupedStatuses[viewingUserIdx];
-    if (!currentGroup) { setViewingUserIdx(-1); return; }
-
-    const timer = setTimeout(() => {
-      if (viewingStatusIdx < currentGroup.statuses.length - 1) {
-        setViewingStatusIdx(v => v + 1);
-      } else {
-        if (viewingUserIdx < groupedStatuses.length - 1) {
-          setViewingUserIdx(v => v + 1);
-          setViewingStatusIdx(0);
-        } else {
-          setViewingUserIdx(-1);
-        }
-      }
-    }, 4000); // 4 sec per status
-    return () => clearTimeout(timer);
-  }, [viewingUserIdx, viewingStatusIdx, groupedStatuses]);
 
   const handleAdd = () => {
     if (!text.trim()) return;
     const bgs = ['linear-gradient(135deg, #FF9A9E, #FECFEF)', 'linear-gradient(135deg, #4facfe, #00f2fe)', 'linear-gradient(135deg, #43e97b, #38f9d7)', 'linear-gradient(135deg, #fa709a, #fee140)', 'linear-gradient(135deg, #30cfd0, #330867)'];
-    const bg = bgs[Math.floor(Math.random() * bgs.length)];
-    onAddStatus(text, bg);
+    onAddStatus(text, bgs[Math.floor(Math.random() * bgs.length)]);
     setAdding(false);
     setText('');
   };
 
-  if (viewingUserIdx >= 0) {
-    const group = groupedStatuses[viewingUserIdx];
-    const status = group?.statuses[viewingStatusIdx];
-    if (!group || !status) return null;
-
-    return (
-      <div style={{ position: 'fixed', inset: 0, background: '#000', zIndex: 9999, display: 'flex', flexDirection: 'column' }}>
-        {/* Progress bars */}
-        <div style={{ display: 'flex', gap: 4, padding: '10px 10px 0 10px', position: 'absolute', top: 0, left: 0, right: 0, zIndex: 10 }}>
-          {group.statuses.map((s, i) => (
-            <div key={s.id} style={{ flex: 1, height: 3, background: 'rgba(255,255,255,0.3)', borderRadius: 2, overflow: 'hidden' }}>
-              <div style={{ height: '100%', background: '#fff', width: i < viewingStatusIdx ? '100%' : i === viewingStatusIdx ? '100%' : '0%', transition: i === viewingStatusIdx ? 'width 4s linear' : 'none' }} />
-            </div>
-          ))}
-        </div>
-        {/* Header */}
-        <div style={{ position: 'absolute', top: 16, left: 16, right: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', zIndex: 10 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Avatar user={group.user} size={40} />
-            <div style={{ color: '#fff' }}>
-              <div style={{ fontWeight: 600, fontSize: 15 }}>{group.user.id === meUser.id ? 'My Status' : group.user.name}</div>
-              <div style={{ fontSize: 12, opacity: 0.8 }}>{new Date(status.ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-            </div>
-          </div>
-          <button onClick={() => setViewingUserIdx(-1)} style={{ background: 'none', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <X size={28} />
-          </button>
-        </div>
-        {/* Content */}
-        <div style={{ flex: 1, background: status.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 40, cursor: 'pointer' }} onClick={() => {
-           if (viewingStatusIdx < group.statuses.length - 1) setViewingStatusIdx(v => v + 1);
-           else if (viewingUserIdx < groupedStatuses.length - 1) { setViewingUserIdx(v => v + 1); setViewingStatusIdx(0); }
-           else setViewingUserIdx(-1);
-        }}>
-          <h1 style={{ color: '#fff', fontSize: 36, textAlign: 'center', textShadow: '0 2px 10px rgba(0,0,0,0.3)' }}>{status.text}</h1>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="chat-area" style={{ background: 'var(--bg-secondary)', display: 'flex', flexDirection: 'column' }}>
-      <div className="chat-header" style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg-tertiary)' }}>
+    <div className="chat-area">
+      <div className="chat-header">
         <h2 style={{ fontSize: 18, margin: 0 }}>Status</h2>
-        <button onClick={onClose} className="icon-btn"><X size={20} /></button>
       </div>
       <div style={{ flex: 1, overflowY: 'auto', padding: 20 }}>
         {adding ? (
-          <div style={{ background: 'var(--bg-tertiary)', padding: 24, borderRadius: 12, maxWidth: 500, margin: '0 auto', boxShadow: 'var(--shadow-md)' }}>
-             <h3 style={{ marginBottom: 16 }}>Create new status</h3>
-             <textarea autoFocus placeholder="Type a status..." value={text} onChange={e=>setText(e.target.value)} style={{ width: '100%', height: 100, background: 'var(--bg-hover)', border: 'none', borderRadius: 8, padding: 12, color: 'var(--text-primary)', outline: 'none', resize: 'none', marginBottom: 16, fontSize: 18 }} />
+          <div style={{ background: 'var(--bg-tertiary)', padding: 24, borderRadius: 20, maxWidth: 500, margin: '20px auto', boxShadow: 'var(--shadow-md)' }}>
+             <h3 style={{ marginBottom: 16 }}>Create Status</h3>
+             <textarea autoFocus placeholder="Type a status..." value={text} onChange={e=>setText(e.target.value)} style={{ width: '100%', height: 120, background: 'var(--bg-hover)', border: 'none', borderRadius: 12, padding: 15, color: 'var(--text-primary)', outline: 'none', resize: 'none', marginBottom: 16, fontSize: 18 }} />
              <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
                <button onClick={() => setAdding(false)} style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '8px 16px', fontWeight: 600 }}>Cancel</button>
-               <button onClick={handleAdd} style={{ background: 'var(--accent-primary)', border: 'none', color: '#fff', cursor: 'pointer', padding: '8px 24px', borderRadius: 24, fontWeight: 600 }}>Post</button>
+               <button onClick={handleAdd} style={{ background: 'var(--accent-primary)', border: 'none', color: '#fff', cursor: 'pointer', padding: '10px 24px', borderRadius: 24, fontWeight: 700 }}>Post</button>
              </div>
           </div>
         ) : (
-          <div style={{ maxWidth: 600, margin: '0 auto' }}>
-             {/* My status row */}
-             <div className="chat-item" style={{ padding: '16px 20px', borderRadius: 12, background: 'var(--bg-tertiary)', marginBottom: 30 }} onClick={() => {
+          <div style={{ maxWidth: 640, margin: '0 auto' }}>
+             <div className="chat-item" style={{ padding: '16px 20px', borderRadius: 16, background: 'var(--bg-tertiary)', marginBottom: 24 }} onClick={() => {
                 const myGroup = groupedStatuses.find(g => g.user.id === meUser.id);
-                if (myGroup) { setViewingUserIdx(groupedStatuses.indexOf(myGroup)); setViewingStatusIdx(0); }
+                if (myGroup) onViewStatus(myGroup);
              }}>
                <div style={{ position: 'relative' }}>
                  <Avatar user={meUser} size={54} />
-                 <button onClick={(e) => { e.stopPropagation(); setAdding(true); }} style={{ position: 'absolute', bottom: -4, right: -4, width: 22, height: 22, background: 'var(--accent-primary)', border: '2px solid var(--bg-tertiary)', borderRadius: '50%', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16, cursor: 'pointer', padding: 0 }}>+</button>
+                 <button onClick={(e) => { e.stopPropagation(); setAdding(true); }} style={{ position: 'absolute', bottom: -2, right: -2, width: 20, height: 20, background: 'var(--accent-primary)', border: '2px solid var(--bg-tertiary)', borderRadius: '50%', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, cursor: 'pointer', padding: 0 }}>+</button>
                </div>
                <div className="chat-body" style={{ paddingLeft: 16 }}>
-                 <div className="chat-name">My status</div>
-                 <div className="chat-preview">{groupedStatuses.find(g=>g.user.id===meUser.id) ? 'Tap to view your status update' : 'Tap to add status update'}</div>
+                 <div className="chat-name">My Status</div>
+                 <div className="chat-preview">{groupedStatuses.find(g=>g.user.id===meUser.id) ? 'View your current updates' : 'Tap to share an update'}</div>
                </div>
              </div>
 
-             <h3 style={{ color: 'var(--text-muted)', fontSize: 14, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 16, paddingLeft: 8 }}>Recent updates</h3>
+             <h3 style={{ color: 'var(--text-muted)', fontSize: 12, textTransform: 'uppercase', letterSpacing: 1.5, marginBottom: 16, paddingLeft: 10, fontWeight: 700 }}>Recent Updates</h3>
              
-             {groupedStatuses.filter(g => g.user.id !== meUser.id).length === 0 && (
-               <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-muted)' }}>No recent updates from your contacts.</div>
-             )}
-
-             {groupedStatuses.filter(g => g.user.id !== meUser.id).map((group, idx) => (
-               <div key={group.user.id} className="chat-item" style={{ borderRadius: 12 }} onClick={() => {
-                  setViewingUserIdx(groupedStatuses.indexOf(group));
-                  setViewingStatusIdx(0);
-               }}>
+             {groupedStatuses.filter(g => g.user.id !== meUser.id).map((group) => (
+               <div key={group.user.id} className="chat-item" style={{ borderRadius: 16, marginBottom: 8 }} onClick={() => onViewStatus(group)}>
                  <div style={{ padding: 3, borderRadius: '50%', border: '2px solid var(--accent-primary)' }}>
                    <Avatar user={group.user} size={48} />
                  </div>
@@ -878,17 +851,43 @@ function StatusViewer({ groupedStatuses, meUser, onClose, onAddStatus }) {
   );
 }
 
+function CallsPage() {
+  return (
+    <div className="chat-area">
+      <div className="chat-header">
+        <h2 style={{ fontSize: 18, margin: 0 }}>Calls</h2>
+      </div>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)', gap: 15 }}>
+        <Phone size={48} />
+        <p>No recent calls found.</p>
+        <button className="welcome-primary-btn" style={{ fontSize: 14, padding: '12px 24px' }}>New Call</button>
+      </div>
+    </div>
+  );
+}
+
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
-function Sidebar({ meUser, conversations, activeConvId, onSelect, onNewChat, onLogout, activeTab, setActiveTab, onOpenProfile, isHidden }) {
+function Sidebar({ meUser, conversations, activeConvId, onSelect, onNewChat, onLogout, activeTab, setActiveTab, onOpenProfile, isHidden, groupedStatuses, onAddStatus, onViewStatus }) {
   const [search, setSearch] = useState('');
   const [activeTabLocal, setActiveTabLocal] = useState('Chats');
   const finalTab = activeTab || activeTabLocal;
   const setTab = setActiveTab || setActiveTabLocal;
+  const [addingStatus, setAddingStatus] = useState(false);
+  const [statusText, setStatusText] = useState('');
 
   const filtered = conversations.filter(c =>
     c.contact.name.toLowerCase().includes(search.toLowerCase()) ||
     c.contact.email.toLowerCase().includes(search.toLowerCase())
   );
+
+  const handlePostStatus = (e) => {
+    e.preventDefault();
+    if (!statusText.trim()) return;
+    const bgs = ['linear-gradient(135deg, #FF9A9E, #FECFEF)', 'linear-gradient(135deg, #4facfe, #00f2fe)', 'linear-gradient(135deg, #43e97b, #38f9d7)', 'linear-gradient(135deg, #fa709a, #fee140)', 'linear-gradient(135deg, #30cfd0, #330867)'];
+    onAddStatus(statusText, bgs[Math.floor(Math.random() * bgs.length)]);
+    setAddingStatus(false);
+    setStatusText('');
+  };
 
   return (
     <div className={`sidebar ${isHidden ? 'hidden' : ''}`}>
@@ -899,35 +898,8 @@ function Sidebar({ meUser, conversations, activeConvId, onSelect, onNewChat, onL
           <span className="sidebar-brand-name">ChatterBox</span>
         </div>
         <div className="sidebar-actions">
-          <button className="icon-btn" onClick={onNewChat} title="New chat" id="new-chat-btn"><Edit3 size={20} /></button>
+          <button className="icon-btn" onClick={onOpenProfile} title="Profile"><User size={20} /></button>
           <button className="icon-btn" onClick={onLogout} title="Sign out"><LogOut size={20} /></button>
-        </div>
-      </div>
-
-      {/* My status */}
-      <div className="my-status-bar" onClick={onOpenProfile} style={{ cursor: 'pointer' }} title="Profile Settings">
-        <div className="my-avatar">
-          <Avatar user={meUser} size={42} />
-          <span className="online-dot" />
-        </div>
-        <div className="my-info">
-          <div className="my-name">{meUser.name}</div>
-          <div className="my-status-text">🟢 Online</div>
-        </div>
-      </div>
-
-      {/* Search */}
-      <div className="search-wrapper">
-        <div className="search-bar">
-          <span className="search-icon"><Search size={16} /></span>
-          <input
-            className="search-input"
-            placeholder="Search conversations..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            id="search-input"
-          />
-          {search && <button style={{ background:'none', border:'none', cursor:'pointer', color:'var(--text-muted)', display:'flex', alignItems:'center' }} onClick={() => setSearch('')}><X size={16} /></button>}
         </div>
       </div>
 
@@ -937,33 +909,40 @@ function Sidebar({ meUser, conversations, activeConvId, onSelect, onNewChat, onL
           <button
             key={t}
             className={`tab-btn ${finalTab === t ? 'active' : ''}`}
-            onClick={() => setTab(t)}
+            onClick={() => { setTab(t); if(t !== 'Chats') onSelect(null); }}
           >
             {t === 'Chats' && <MessageCircle size={16} />}{t === 'Status' && <Zap size={16} />}{t === 'Calls' && <Phone size={16} />}{t}
           </button>
         ))}
       </div>
 
-      {/* List */}
+      {/* List Content */}
       <div className="chat-list">
         {finalTab === 'Chats' && (
           <>
+            <div className="search-wrapper">
+              <div className="search-bar">
+                <span className="search-icon"><Search size={16} /></span>
+                <input
+                  className="search-input"
+                  placeholder="Search chats..."
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                />
+                <button className="icon-btn" onClick={onNewChat} style={{ color: 'var(--accent-primary)' }}><Plus size={20} /></button>
+              </div>
+            </div>
             {filtered.length === 0 && (
-              <div style={{ padding: 24, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
-                <div style={{ fontSize: 32, marginBottom: 8, display: 'flex', justifyContent: 'center' }}><MessageCircle size={40} /></div>
-                {search ? `No results for "${search}"` : 'No conversations yet. Start a new chat!'}
+              <div style={{ padding: 40, textAlign: 'center', color: 'var(--text-muted)' }}>
+                <MessageCircle size={40} style={{ marginBottom: 12, opacity: 0.5 }} />
+                <p>{search ? 'No results found' : 'No chats yet'}</p>
               </div>
             )}
             {filtered.map(conv => {
               const last = conv.messages[conv.messages.length - 1];
               const isActive = conv.id === activeConvId;
               return (
-                <div
-                  key={conv.id}
-                  className={`chat-item ${isActive ? 'active' : ''} ${conv.unread > 0 ? 'unread' : ''}`}
-                  onClick={() => onSelect(conv)}
-                  id={`chat-item-${conv.id}`}
-                >
+                <div key={conv.id} className={`chat-item ${isActive ? 'active' : ''} ${conv.unread > 0 ? 'unread' : ''}`} onClick={() => onSelect(conv)}>
                   <OnlineAvatar user={conv.contact} size={46} borderColor={isActive ? 'var(--bg-hover)' : 'var(--bg-secondary)'} />
                   <div className="chat-body">
                     <div className="chat-top-row">
@@ -971,10 +950,7 @@ function Sidebar({ meUser, conversations, activeConvId, onSelect, onNewChat, onL
                       <span className="chat-time">{last?.time || ''}</span>
                     </div>
                     <div className="chat-bottom-row">
-                      <span className="chat-preview">
-                        {last?.from === meUser.id && <span style={{ color: 'var(--accent-primary)' }}>✓✓ </span>}
-                        {last?.text || <em style={{ color: 'var(--text-muted)' }}>Start the conversation</em>}
-                      </span>
+                      <span className="chat-preview">{last?.text || 'Start chatting...'}</span>
                       {conv.unread > 0 && <span className="unread-badge">{conv.unread}</span>}
                     </div>
                   </div>
@@ -983,16 +959,49 @@ function Sidebar({ meUser, conversations, activeConvId, onSelect, onNewChat, onL
             })}
           </>
         )}
+
         {finalTab === 'Status' && (
-          <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', marginTop: 40 }}>
-            <div style={{ display: 'flex', justifyContent: 'center' }}><Zap size={40} className="pulse" /></div>
-            <p>View updates from your contacts on the right panel.</p>
+          <div style={{ padding: '4px 0' }}>
+            {addingStatus ? (
+              <form onSubmit={handlePostStatus} style={{ padding: 16 }}>
+                <textarea autoFocus className="msg-input" placeholder="What's on your mind?" value={statusText} onChange={e=>setStatusText(e.target.value)} style={{ width: '100%', height: 100, background: 'var(--bg-tertiary)', borderRadius: 12, padding: 12, color: 'var(--text-primary)', border: '1px solid var(--border)', resize: 'none', marginBottom: 10 }} />
+                <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
+                  <button type="button" onClick={() => setAddingStatus(false)} className="tab-btn" style={{ textTransform: 'none' }}>Cancel</button>
+                  <button type="submit" className="welcome-primary-btn" style={{ padding: '8px 20px', fontSize: 13 }}>Post</button>
+                </div>
+              </form>
+            ) : (
+              <>
+                <div className="chat-item" onClick={() => { const g = groupedStatuses.find(x=>x.user.id===meUser.id); if(g) onViewStatus(g); }}>
+                  <div style={{ position: 'relative' }}>
+                    <Avatar user={meUser} size={48} />
+                    <button onClick={(e) => { e.stopPropagation(); setAddingStatus(true); }} style={{ position: 'absolute', bottom: -2, right: -2, width: 20, height: 20, background: 'var(--accent-primary)', border: '2px solid var(--bg-secondary)', borderRadius: '50%', color: '#fff', fontSize: 14 }}>+</button>
+                  </div>
+                  <div className="chat-body">
+                    <div className="chat-name">My Status</div>
+                    <div className="chat-preview">Tap to add or view update</div>
+                  </div>
+                </div>
+                <div style={{ padding: '15px 20px 8px', fontSize: 11, fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: 1 }}>Recent Updates</div>
+                {groupedStatuses.filter(g => g.user.id !== meUser.id).map(g => (
+                  <div key={g.user.id} className="chat-item" onClick={() => onViewStatus(g)}>
+                    <div style={{ padding: 2, border: '2px solid var(--accent-primary)', borderRadius: '50%' }}><Avatar user={g.user} size={44} /></div>
+                    <div className="chat-body">
+                      <div className="chat-name">{g.user.name}</div>
+                      <div className="chat-preview">{new Date(g.statuses[g.statuses.length-1].ts).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
+                    </div>
+                  </div>
+                ))}
+              </>
+            )}
           </div>
         )}
+
         {finalTab === 'Calls' && (
-          <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', marginTop: 40 }}>
-            <div style={{ display: 'flex', justifyContent: 'center' }}><Phone size={40} /></div>
-            <p>Call history coming soon</p>
+          <div style={{ textAlign: 'center', marginTop: 60, padding: 20, color: 'var(--text-muted)' }}>
+            <Phone size={40} style={{ marginBottom: 15, opacity: 0.5 }} />
+            <div style={{ fontSize: 14, fontWeight: 600 }}>No recent calls</div>
+            <p style={{ fontSize: 12, marginTop: 5 }}>Your call history will appear here.</p>
           </div>
         )}
       </div>
@@ -1221,6 +1230,7 @@ export default function App() {
   const [showNewChat, setShowNewChat] = useState(false);
   const [showProfileSettings, setShowProfileSettings] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+  const [viewingStatusGroup, setViewingStatusGroup] = useState(null);
   const [toast, setToast] = useState(null);
 
   const showToast = (t) => { setToast(t); setTimeout(() => setToast(null), 3000); };
@@ -1296,16 +1306,21 @@ export default function App() {
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         onOpenProfile={() => setShowProfileSettings(true)}
-        isHidden={!!activeConv || activeTab === 'Status'}
+        isHidden={!!activeConv}
+        groupedStatuses={statuses}
+        onAddStatus={handleAddStatus}
+        onViewStatus={(g) => setViewingStatusGroup(g)}
       />
 
       {activeTab === 'Status' ? (
-        <StatusViewer 
+        <StatusPage 
           groupedStatuses={statuses} 
           meUser={meUser} 
-          onClose={() => setActiveTab('Chats')} 
           onAddStatus={handleAddStatus}
+          onViewStatus={(g) => setViewingStatusGroup(g)}
         />
+      ) : activeTab === 'Calls' ? (
+        <CallsPage />
       ) : activeConv ? (
         <ChatArea
           key={activeConv.id}
@@ -1317,9 +1332,18 @@ export default function App() {
           onBack={() => setActiveConv(null)}
         />
       ) : (
-        <div className="chat-area mobile-hidden-welcome">
+        <div className={`chat-area mobile-hidden-welcome`}>
           <WelcomeScreen meUser={meUser} onNewChat={() => setShowNewChat(true)} />
         </div>
+      )}
+
+      {viewingStatusGroup && (
+        <StatusView 
+          group={viewingStatusGroup} 
+          meUser={meUser} 
+          onClose={() => setViewingStatusGroup(null)} 
+          onFinish={() => setViewingStatusGroup(null)} 
+        />
       )}
 
       {showInfo && activeConv && (
