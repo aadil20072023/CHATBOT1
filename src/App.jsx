@@ -1332,14 +1332,18 @@ export default function App() {
       />
 
       {activeTab === 'Status' ? (
-        <StatusPage 
-          groupedStatuses={statuses} 
-          meUser={meUser} 
-          onAddStatus={handleAddStatus}
-          onViewStatus={(g) => setViewingStatusGroup(g)}
-        />
+        <div className="chat-area mobile-hidden-status">
+          <StatusPage 
+            groupedStatuses={statuses} 
+            meUser={meUser} 
+            onAddStatus={handleAddStatus}
+            onViewStatus={(g) => setViewingStatusGroup(g)}
+          />
+        </div>
       ) : activeTab === 'Calls' ? (
-        <CallsPage />
+        <div className="chat-area mobile-hidden-calls">
+          <CallsPage />
+        </div>
       ) : activeConv ? (
         <ChatArea
           key={activeConv.id}

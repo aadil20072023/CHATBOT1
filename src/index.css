@@ -1818,7 +1818,9 @@ body {
   .back-btn {
     display: flex;
   }
-  .mobile-hidden-welcome {
+  .mobile-hidden-welcome,
+  .mobile-hidden-status,
+  .mobile-hidden-calls {
     display: none !important;
   }
   .info-panel {
