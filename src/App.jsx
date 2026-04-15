@@ -1071,36 +1071,36 @@ function AdminExternalPanel({ currentUserId, onLogout }) {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column', color: 'var(--text-primary)', fontFamily: "'Outfit', sans-serif" }}>
-      <header style={{ padding: '24px 60px', background: 'rgba(15, 17, 21, 0.8)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', sticky: 'top', zIndex: 100 }}>
+    <div style={{ height: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column', color: 'var(--text-primary)', fontFamily: "'Outfit', sans-serif", overflowY: 'auto' }}>
+      <header style={{ padding: '20px 40px', background: 'rgba(15, 17, 21, 0.85)', backdropFilter: 'blur(20px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', position: 'sticky', top: 0, zIndex: 1000 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
            <div style={{ width: 42, height: 42, background: 'var(--bubble-out)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--shadow-glow)' }}>
              <Shield size={24} color="white" />
            </div>
            <div>
-             <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, letterSpacing: '-0.5px' }}>System Admin</h1>
-             <p style={{ margin: 0, fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>Management Dashboard</p>
+             <h1 style={{ margin: 0, fontSize: 20, fontWeight: 700, letterSpacing: '-0.5px' }}>System Admin</h1>
+             <p style={{ margin: 0, fontSize: 11, color: 'var(--text-muted)', fontWeight: 500 }}>Management Dashboard</p>
            </div>
         </div>
-        <div style={{ display: 'flex', gap: 16 }}>
-           <button onClick={() => window.location.replace('/CHATBOT1/')} style={{ padding: '10px 24px', background: 'var(--bg-tertiary)', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 600, fontSize: 14, transition: 'var(--transition)' }}>Back to App</button>
-           <button onClick={onLogout} style={{ padding: '10px 24px', background: 'rgba(231, 76, 60, 0.15)', border: '1px solid rgba(231, 76, 60, 0.3)', borderRadius: 12, color: '#ff6b6b', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>Logout</button>
+        <div style={{ display: 'flex', gap: 12 }}>
+           <button onClick={() => window.location.replace('/CHATBOT1/')} style={{ padding: '8px 20px', background: 'var(--bg-tertiary)', border: '1px solid var(--border)', borderRadius: 10, color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 600, fontSize: 13, transition: 'var(--transition)' }}>Back to App</button>
+           <button onClick={onLogout} style={{ padding: '8px 20px', background: 'rgba(231, 76, 60, 0.15)', border: '1px solid rgba(231, 76, 60, 0.3)', borderRadius: 10, color: '#ff6b6b', cursor: 'pointer', fontWeight: 600, fontSize: 13 }}>Logout</button>
         </div>
       </header>
       
-      <main style={{ flex: 1, padding: '60px 20px', maxWidth: 1000, margin: '0 auto', width: '100%' }}>
-         <div style={{ marginBottom: 40, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+      <main style={{ flex: 1, padding: '40px 20px', maxWidth: 1000, margin: '0 auto', width: '100%' }}>
+         <div style={{ marginBottom: 30, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', flexWrap: 'wrap', gap: 20 }}>
             <div>
-              <h2 style={{ fontSize: 32, fontWeight: 800, margin: 0, letterSpacing: '-1px' }}>User Management</h2>
-              <p style={{ color: 'var(--text-muted)', marginTop: 8 }}>Overview of all registered accounts on the platform</p>
+              <h2 style={{ fontSize: 28, fontWeight: 800, margin: 0, letterSpacing: '-1px' }}>User Management</h2>
+              <p style={{ color: 'var(--text-muted)', marginTop: 6, fontSize: 14 }}>Overview of all registered accounts on the platform</p>
             </div>
-            <div style={{ padding: '14px 28px', background: 'var(--bg-tertiary)', borderRadius: 20, border: '1px solid var(--border)', textAlign: 'center' }}>
-               <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--accent-primary)' }}>{users.length}</div>
-               <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600 }}>Total Users</div>
+            <div style={{ padding: '12px 24px', background: 'var(--bg-tertiary)', borderRadius: 16, border: '1px solid var(--border)', textAlign: 'center', minWidth: 120 }}>
+               <div style={{ fontSize: 22, fontWeight: 800, color: 'var(--accent-primary)' }}>{users.length}</div>
+               <div style={{ fontSize: 10, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 700 }}>Total Users</div>
             </div>
          </div>
 
-         <div style={{ background: 'var(--bg-tertiary)', borderRadius: 24, border: '1px solid var(--border)', padding: 12, boxShadow: 'var(--shadow-lg)', overflow: 'hidden' }}>
+         <div style={{ background: 'var(--bg-tertiary)', borderRadius: 24, border: '1px solid var(--border)', padding: 10, boxShadow: 'var(--shadow-lg)' }}>
             <div style={{ height: 60, display: 'flex', alignItems: 'center', padding: '0 24px', borderBottom: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>
                <div style={{ flex: 2 }}>User Info</div>
                <div style={{ flex: 1 }}>Status</div>
