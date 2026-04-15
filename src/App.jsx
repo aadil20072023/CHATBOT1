@@ -6,7 +6,8 @@ import {
   getOrCreateConv, sendMessage,
   markConvRead, deleteMessage, subscribeMessages,
   addStatus, subscribeStatuses,
-  setTypingStatus, subscribeTypingStatus, getAllUsers
+  setTypingStatus, subscribeTypingStatus, getAllUsers,
+  updateProfile
 } from './auth.js';
 import { EMOJIS } from './data.js';
 import emailjs from '@emailjs/browser';
@@ -264,8 +265,6 @@ function NewChatModal({ currentUserId, onStartChat, onClose }) {
 }
 
 // ─── Profile Settings Modal ──────────────────────────────────────────────────
-import { updateProfile } from './auth.js';
-
 function ProfileSettingsModal({ user, onClose, onUpdate }) {
   const [name, setName] = useState(user.name);
   const [username, setUsername] = useState(user.username || '');
@@ -722,7 +721,7 @@ function ChatArea({ convId, contactUser, meUser, showInfo, setShowInfo, onBack }
           
           {(!isRecording && input.trim()) && (
             <button className="send-btn" onClick={handleSend} id="send-btn" title="Send" style={{ width: 44, height: 44, borderRadius: '50%', background: 'var(--accent-primary)', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, transition: 'transform 0.2s' }}>
-              ➤
+              <Send size={20} />
             </button>
           )}
         </div>
@@ -1045,7 +1044,9 @@ function AdminExternalPanel({ currentUserId, onLogout }) {
     <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column', color: 'var(--text-primary)', fontFamily: "'Outfit', sans-serif" }}>
       <header style={{ padding: '24px 60px', background: 'rgba(15, 17, 21, 0.8)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', sticky: 'top', zIndex: 100 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-           <div style={{ width: 42, height: 42, background: 'var(--bubble-out)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, boxShadow: 'var(--shadow-glow)' }}>🛡️</div>
+           <div style={{ width: 42, height: 42, background: 'var(--bubble-out)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'var(--shadow-glow)' }}>
+             <Shield size={24} color="white" />
+           </div>
            <div>
              <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, letterSpacing: '-0.5px' }}>System Admin</h1>
              <p style={{ margin: 0, fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>Management Dashboard</p>
