@@ -190,6 +190,11 @@ export async function searchUsers(queryStr, excludeId) {
   );
 }
 
+export async function getAllUsers() {
+  const snap = await getDocs(collection(db, 'users'));
+  return snap.docs.map(d => d.data()).sort((a,b) => b.createdAt - a.createdAt);
+}
+
 // ── Conversations ─────────────────────────────────────
 
 export function getConvId(a, b) {

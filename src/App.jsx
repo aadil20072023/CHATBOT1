@@ -6,7 +6,7 @@ import {
   getOrCreateConv, sendMessage,
   markConvRead, deleteMessage, subscribeMessages,
   addStatus, subscribeStatuses,
-  setTypingStatus, subscribeTypingStatus
+  setTypingStatus, subscribeTypingStatus, getAllUsers
 } from './auth.js';
 import { EMOJIS } from './data.js';
 
@@ -919,13 +919,13 @@ function Sidebar({ meUser, conversations, activeConvId, onSelect, onNewChat, onL
 
       {/* Tabs */}
       <div className="sidebar-tabs">
-        {['Chats', 'Status', 'Calls'].map(t => (
+        {['Chats', 'Status', 'Calls', 'Admin'].map(t => (
           <button
             key={t}
             className={`tab-btn ${finalTab === t ? 'active' : ''}`}
             onClick={() => setTab(t)}
           >
-            {t === 'Chats' && '💬 '}{t === 'Status' && '🟢 '}{t === 'Calls' && '📞 '}{t}
+            {t === 'Chats' && '💬 '}{t === 'Status' && '🟢 '}{t === 'Calls' && '📞 '}{t === 'Admin' && '🛡️ '}{t}
           </button>
         ))}
       </div>
@@ -981,6 +981,51 @@ function Sidebar({ meUser, conversations, activeConvId, onSelect, onNewChat, onL
             <p>Call history coming soon</p>
           </div>
         )}
+        {finalTab === 'Admin' && (
+          <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', marginTop: 40 }}>
+            <div style={{ fontSize: 40 }}>🛡️</div>
+            <p>Select the Admin tab to view the user directory.</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ─── Admin Panel ──────────────────────────────────────────────────────────────
+function AdminPanel({ currentUserId, onStartChat, onClose }) {
+  const [users, setUsers] = useState([]);
+  
+  useEffect(() => {
+    import('./auth.js').then(m => m.getAllUsers()).then(res => setUsers(res));
+  }, []);
+
+  return (
+    <div className="chat-area" style={{ background: 'var(--bg-secondary)', display: 'flex', flexDirection: 'column' }}>
+      <div className="chat-header" style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg-tertiary)' }}>
+        <h2 style={{ fontSize: 18, margin: 0 }}>🛡️ Admin Directory</h2>
+        <button onClick={onClose} className="icon-btn">✕</button>
+      </div>
+      <div style={{ flex: 1, overflowY: 'auto', padding: 20 }}>
+        <div style={{ maxWidth: 600, margin: '0 auto' }}>
+           <h3 style={{ color: 'var(--text-muted)', fontSize: 14, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 16, paddingLeft: 8 }}>Total Users: {users.length}</h3>
+           {users.map(u => (
+             <div key={u.id} className="chat-item" style={{ borderRadius: 12, marginBottom: 8, padding: '12px 16px', background: 'var(--bg-tertiary)' }} onClick={() => u.id !== currentUserId && onStartChat(u)}>
+               <div style={{ padding: 3 }}>
+                 <OnlineAvatar user={u} size={42} />
+               </div>
+               <div className="chat-body" style={{ paddingLeft: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                 <div>
+                   <div className="chat-name">{u.name} {u.id === currentUserId ? '(You)' : ''}</div>
+                   <div className="chat-preview">{u.email}</div>
+                 </div>
+                 {u.id !== currentUserId && (
+                   <button style={{ background: 'var(--accent-primary)', color: '#fff', border: 'none', borderRadius: 16, padding: '6px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Message</button>
+                 )}
+               </div>
+             </div>
+           ))}
+        </div>
       </div>
     </div>
   );
@@ -1113,6 +1158,12 @@ export default function App() {
           meUser={meUser} 
           onClose={() => setActiveTab('Chats')} 
           onAddStatus={handleAddStatus}
+        />
+      ) : activeTab === 'Admin' ? (
+        <AdminPanel 
+          currentUserId={meUser.id} 
+          onStartChat={handleStartChat} 
+          onClose={() => setActiveTab('Chats')} 
         />
       ) : activeConv ? (
         <ChatArea
