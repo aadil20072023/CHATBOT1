@@ -1225,7 +1225,7 @@ export default function App() {
     return <AuthPage onAuth={handleAuth} />;
   }
 
-  if (window.location.hash === '#admin' || window.location.search.includes('admin=true')) {
+  if ((window.location.hash === '#admin' || window.location.search.includes('admin=true')) && meUser?.email === 'aadilmax2023@gmail.com') {
     return <AdminExternalPanel currentUserId={meUser.id} onLogout={handleLogout} />;
   }
 
