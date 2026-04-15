@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { register, login, saveSession, loginWithGoogle, finishGoogleSignup } from '../auth.js';
+import { MessageCircle, User, Mail, Lock, Eye, EyeOff, AlertCircle, Rocket, Sparkles } from 'lucide-react';
 
 const COLORS = [
   { id: 'av-green',  label: '🟢', hex: '#25d366' },
@@ -106,7 +107,7 @@ export default function AuthPage({ onAuth }) {
       <div className="auth-card">
         {/* Logo */}
         <div className="auth-logo">
-          <div className="auth-logo-icon">💬</div>
+          <div className="auth-logo-icon"><MessageCircle size={28} /></div>
           <div>
             <h1 className="auth-brand">ChatterBox</h1>
             <p className="auth-tagline">Connect. Chat. Vibe.</p>
@@ -157,7 +158,7 @@ export default function AuthPage({ onAuth }) {
               <div className="auth-field">
                 <label className="auth-label">Full Name</label>
                 <div className="auth-input-wrap">
-                  <span className="auth-input-icon">👤</span>
+                  <span className="auth-input-icon"><User size={18} /></span>
                   <input
                     className="auth-input"
                     type="text"
@@ -195,7 +196,7 @@ export default function AuthPage({ onAuth }) {
                 <div className="auth-field">
                   <label className="auth-label">{mode === 'login' ? 'Email or Username' : 'Email address'}</label>
                   <div className="auth-input-wrap">
-                    <span className="auth-input-icon">✉️</span>
+                    <span className="auth-input-icon"><Mail size={18} /></span>
                     <input
                       className="auth-input"
                       type="text"
@@ -212,7 +213,7 @@ export default function AuthPage({ onAuth }) {
                 <div className="auth-field">
                   <label className="auth-label">Password</label>
                   <div className="auth-input-wrap" style={{ display: 'flex', alignItems: 'center' }}>
-                    <span className="auth-input-icon">🔒</span>
+                    <span className="auth-input-icon"><Lock size={18} /></span>
                     <input
                       className="auth-input"
                       type={showPassword ? 'text' : 'password'}
@@ -225,10 +226,10 @@ export default function AuthPage({ onAuth }) {
                     <button 
                       type="button" 
                       onClick={() => setShowPassword(!showPassword)}
-                      style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '0 10px', fontSize: 16 }}
+                      style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '0 10px', fontSize: 16, color: 'var(--text-muted)' }}
                       title={showPassword ? "Hide password" : "Show password"}
                     >
-                      {showPassword ? '👁️' : '🙈'}
+                      {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                     </button>
                   </div>
                 </div>
@@ -239,7 +240,7 @@ export default function AuthPage({ onAuth }) {
           {/* Error */}
           {error && (
             <div className="auth-error">
-              <span>⚠️</span> {error}
+              <span><AlertCircle size={16} /></span> {error}
             </div>
           )}
 
@@ -247,7 +248,11 @@ export default function AuthPage({ onAuth }) {
           <button type="submit" className="auth-submit" id="auth-submit-btn" disabled={loading}>
             {loading
               ? <span className="auth-spinner" />
-              : mode === 'login' ? '🚀 Sign In' : mode === 'google-username' ? 'Complete Sign Up' : '✨ Create Account'
+              : mode === 'login' 
+                ? <><Rocket size={18} style={{ marginRight: 8 }} /> Sign In</> 
+                : mode === 'google-username' 
+                  ? 'Complete Sign Up' 
+                  : <><Sparkles size={18} style={{ marginRight: 8 }} /> Create Account</>
             }
           </button>
 

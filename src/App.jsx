@@ -10,6 +10,13 @@ import {
 } from './auth.js';
 import { EMOJIS } from './data.js';
 import emailjs from '@emailjs/browser';
+import { 
+  MessageCircle, Edit3, LogOut, Search, Shield, Video, Phone, 
+  MoreVertical, Smile, Paperclip, Mic, Square, Send, X, 
+  RotateCcw, Copy, Star, Forward, Trash2, Home, Settings,
+  CheckCheck, Info, Monitor, Zap, Plus, Play, Pause, AlertCircle,
+  Menu, User
+} from 'lucide-react';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -94,12 +101,12 @@ function AudioPlayer({ src, isMe, contactUser, meUser }) {
       <button 
         onClick={toggle} 
         style={{ 
-           background: 'none', border: 'none', cursor: 'pointer', fontSize: 26, padding: 0,
+           background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
            color: isMe ? '#fff' : 'var(--text-primary)',
         }}
         title={playing ? "Pause" : "Play"}
       >
-        {playing ? '⏸️' : '▶️'}
+        {playing ? <Pause size={20} fill="currentColor" /> : <Play size={20} fill="currentColor" />}
       </button>
 
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
@@ -139,11 +146,11 @@ function ContextMenu({ x, y, isMe, onClose, onReply, onDelete }) {
   }, [onClose]);
 
   const items = [
-    { icon: '↩️', label: 'Reply',   action: onReply },
-    { icon: '📋', label: 'Copy',    action: onClose },
-    { icon: '⭐', label: 'Star',    action: onClose },
-    { icon: '↗️', label: 'Forward', action: onClose },
-    ...(isMe ? [{ icon: '🗑️', label: 'Delete', danger: true, action: onDelete }] : []),
+    { icon: <RotateCcw size={16} />, label: 'Reply',   action: onReply },
+    { icon: <Copy size={16} />,      label: 'Copy',    action: onClose },
+    { icon: <Star size={16} />,      label: 'Star',    action: onClose },
+    { icon: <Forward size={16} />,   label: 'Forward', action: onClose },
+    ...(isMe ? [{ icon: <Trash2 size={16} />, label: 'Delete', danger: true, action: onDelete }] : []),
   ];
 
   return (
@@ -206,12 +213,14 @@ function NewChatModal({ currentUserId, onStartChat, onClose }) {
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal">
         <div className="modal-header">
-          <button className="icon-btn" onClick={onClose}>✕</button>
-          <span className="modal-title">💬 New Chat</span>
+          <button className="icon-btn" onClick={onClose}><X size={20} /></button>
+          <span className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <MessageCircle size={18} /> New Chat
+          </span>
         </div>
         <div className="modal-body">
           <div className="search-bar">
-            <span className="search-icon">🔍</span>
+            <span className="search-icon"><Search size={16} /></span>
             <input
               className="search-input"
               placeholder="Enter exact @username or email..."
@@ -225,7 +234,7 @@ function NewChatModal({ currentUserId, onStartChat, onClose }) {
           <div className="user-search-results">
             {results.length === 0 && (
               <div className="search-empty">
-                <div className="search-empty-icon">🔍</div>
+                <div className="search-empty-icon"><Search size={40} /></div>
                 <p>{query.trim() ? `No users found for "${query}"` : "Search for a user to start chatting"}</p>
               </div>
             )}
@@ -306,8 +315,10 @@ function ProfileSettingsModal({ user, onClose, onUpdate }) {
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="modal" style={{ maxWidth: 400 }}>
         <div className="modal-header">
-          <button className="icon-btn" onClick={onClose} type="button">✕</button>
-          <span className="modal-title">Settings</span>
+          <button className="icon-btn" onClick={onClose} type="button"><X size={20} /></button>
+          <span className="modal-title" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            <Settings size={18} /> Settings
+          </span>
         </div>
         <form className="modal-body" onSubmit={handleSave}>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 24, position: 'relative' }}>
@@ -338,7 +349,7 @@ function ProfileSettingsModal({ user, onClose, onUpdate }) {
 
           {error && (
              <div className="auth-error" style={{ marginTop: 16 }}>
-                <span>⚠️</span> {error}
+                <span><AlertCircle size={16} /></span> {error}
              </div>
           )}
 
@@ -356,7 +367,7 @@ function InfoPanel({ user, onClose }) {
   return (
     <div className="info-panel">
       <div className="info-panel-header">
-        <button className="icon-btn" onClick={onClose}>✕</button>
+        <button className="icon-btn" onClick={onClose}><X size={20} /></button>
         <span className="info-panel-title">Contact Info</span>
       </div>
       <div className="info-cover">
@@ -367,7 +378,7 @@ function InfoPanel({ user, onClose }) {
       <div className="info-section">
         <div className="info-section-title">About</div>
         <div className="info-row">
-          <span className="info-row-icon">ℹ️</span>
+          <span className="info-row-icon"><Info size={16} /></span>
           <span className="info-row-text">{user.about || 'Hey there! I am using ChatterBox.'}</span>
         </div>
         <div className="info-row">
@@ -433,7 +444,7 @@ function MessageBubble({ msg, contactUser, meUser, onContextMenu }) {
           )}
           <div className="msg-meta">
             <span className="msg-time">{msg.time}</span>
-            {isMe && <span className={`msg-ticks ${msg.read ? 'read' : ''}`}>✓✓</span>}
+            {isMe && <span className={`msg-ticks ${msg.read ? 'read' : ''}`}><CheckCheck size={14} /></span>}
           </div>
         </div>
       </div>
@@ -594,14 +605,14 @@ function ChatArea({ convId, contactUser, meUser, showInfo, setShowInfo, onBack }
           </div>
         </div>
         <div className="chat-header-actions">
-          <button className="icon-btn" title="Video call">📹</button>
-          <button className="icon-btn" title="Voice call">📞</button>
+          <button className="icon-btn" title="Video call"><Video size={20} /></button>
+          <button className="icon-btn" title="Voice call"><Phone size={20} /></button>
           <button
             className="icon-btn"
             onClick={() => setShowInfo(v => !v)}
             title="Contact info"
             style={showInfo ? { background: 'var(--accent-glow)', color: 'var(--accent-primary)' } : {}}
-          >⋮</button>
+          ><MoreVertical size={20} /></button>
         </div>
       </div>
 
@@ -644,12 +655,12 @@ function ChatArea({ convId, contactUser, meUser, showInfo, setShowInfo, onBack }
               <div className="reply-bar-name">{replyTo.from === meUser.id ? 'You' : contactUser.name}</div>
               <div className="reply-bar-text">{replyTo.text}</div>
             </div>
-            <button className="reply-close" onClick={() => setReplyTo(null)}>✕</button>
+            <button className="reply-close" onClick={() => setReplyTo(null)}><X size={18} /></button>
           </div>
         )}
         <div className="input-row">
           <div className="input-actions">
-            <button className="icon-btn" title="Attach" onClick={handleAttachClick} style={{ fontSize: 18 }}>📎</button>
+            <button className="icon-btn" title="Attach" onClick={handleAttachClick}><Paperclip size={20} /></button>
             <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" style={{ display: 'none' }} />
           </div>
           <div className="input-box-wrap" style={{ flex: 1, display: 'flex', alignItems: 'center', background: 'var(--bg-tertiary)', borderRadius: 24, padding: '8px 16px' }}>
@@ -667,7 +678,7 @@ function ChatArea({ convId, contactUser, meUser, showInfo, setShowInfo, onBack }
               </div>
             ) : (
               <>
-                <button className="emoji-btn" onClick={() => setShowEmoji(v => !v)} title="Emoji" style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 20 }}>😊</button>
+                <button className="emoji-btn" onClick={() => setShowEmoji(v => !v)} title="Emoji" style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', color: 'var(--text-muted)' }}><Smile size={22} /></button>
                 <textarea
                   ref={inputRef}
                   className="msg-input"
@@ -693,7 +704,7 @@ function ChatArea({ convId, contactUser, meUser, showInfo, setShowInfo, onBack }
                 title="Record voice" 
                 style={{ marginLeft: 4 }}
               >
-                🎙️
+                <Mic size={20} />
               </button>
             )}
 
@@ -704,7 +715,7 @@ function ChatArea({ convId, contactUser, meUser, showInfo, setShowInfo, onBack }
                 title="Stop and Send" 
                 style={{ color: '#e74c3c', marginLeft: 4 }}
               >
-                ⏹️
+                <Square size={20} fill="currentColor" />
               </button>
             )}
           </div>
@@ -882,12 +893,12 @@ function Sidebar({ meUser, conversations, activeConvId, onSelect, onNewChat, onL
       {/* Header */}
       <div className="sidebar-header">
         <div className="sidebar-brand">
-          <div className="sidebar-brand-logo">💬</div>
+          <div className="sidebar-brand-logo"><MessageCircle size={22} color="white" /></div>
           <span className="sidebar-brand-name">ChatterBox</span>
         </div>
         <div className="sidebar-actions">
-          <button className="icon-btn" onClick={onNewChat} title="New chat" id="new-chat-btn">✏️</button>
-          <button className="icon-btn" onClick={onLogout} title="Sign out">🚪</button>
+          <button className="icon-btn" onClick={onNewChat} title="New chat" id="new-chat-btn"><Edit3 size={20} /></button>
+          <button className="icon-btn" onClick={onLogout} title="Sign out"><LogOut size={20} /></button>
         </div>
       </div>
 
@@ -906,7 +917,7 @@ function Sidebar({ meUser, conversations, activeConvId, onSelect, onNewChat, onL
       {/* Search */}
       <div className="search-wrapper">
         <div className="search-bar">
-          <span className="search-icon">🔍</span>
+          <span className="search-icon"><Search size={16} /></span>
           <input
             className="search-input"
             placeholder="Search conversations..."
@@ -914,7 +925,7 @@ function Sidebar({ meUser, conversations, activeConvId, onSelect, onNewChat, onL
             onChange={e => setSearch(e.target.value)}
             id="search-input"
           />
-          {search && <button style={{ background:'none', border:'none', cursor:'pointer', color:'var(--text-muted)', fontSize:14 }} onClick={() => setSearch('')}>✕</button>}
+          {search && <button style={{ background:'none', border:'none', cursor:'pointer', color:'var(--text-muted)', display:'flex', alignItems:'center' }} onClick={() => setSearch('')}><X size={16} /></button>}
         </div>
       </div>
 
@@ -926,7 +937,7 @@ function Sidebar({ meUser, conversations, activeConvId, onSelect, onNewChat, onL
             className={`tab-btn ${finalTab === t ? 'active' : ''}`}
             onClick={() => setTab(t)}
           >
-            {t === 'Chats' && '💬 '}{t === 'Status' && '🟢 '}{t === 'Calls' && '📞 '}{t}
+            {t === 'Chats' && <MessageCircle size={16} />}{t === 'Status' && <Zap size={16} />}{t === 'Calls' && <Phone size={16} />}{t}
           </button>
         ))}
       </div>
@@ -937,8 +948,8 @@ function Sidebar({ meUser, conversations, activeConvId, onSelect, onNewChat, onL
           <>
             {filtered.length === 0 && (
               <div style={{ padding: 24, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
-                <div style={{ fontSize: 32, marginBottom: 8 }}>💬</div>
-                {search ? `No results for "${search}"` : 'No conversations yet. Click ✏️ to start chatting!'}
+                <div style={{ fontSize: 32, marginBottom: 8, display: 'flex', justifyContent: 'center' }}><MessageCircle size={40} /></div>
+                {search ? `No results for "${search}"` : 'No conversations yet. Start a new chat!'}
               </div>
             )}
             {filtered.map(conv => {
@@ -972,13 +983,13 @@ function Sidebar({ meUser, conversations, activeConvId, onSelect, onNewChat, onL
         )}
         {finalTab === 'Status' && (
           <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', marginTop: 40 }}>
-            <div style={{ fontSize: 40 }}>🟢</div>
+            <div style={{ display: 'flex', justifyContent: 'center' }}><Zap size={40} className="pulse" /></div>
             <p>View updates from your contacts on the right panel.</p>
           </div>
         )}
         {finalTab === 'Calls' && (
-          <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13 }}>
-            <div style={{ fontSize: 40, marginBottom: 12 }}>📞</div>
+          <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', marginTop: 40 }}>
+            <div style={{ display: 'flex', justifyContent: 'center' }}><Phone size={40} /></div>
             <p>Call history coming soon</p>
           </div>
         )}
@@ -1151,7 +1162,9 @@ function WelcomeScreen({ meUser, onNewChat }) {
   return (
     <div className="chat-area" style={{ background: 'radial-gradient(circle at center, var(--bg-hover) 0%, var(--bg-primary) 100%)' }}>
       <div className="welcome-screen" style={{ padding: '60px' }}>
-        <div className="welcome-icon" style={{ width: 120, height: 120, fontSize: 54, border: '4px solid rgba(255,255,255,0.05)' }}>💬</div>
+        <div className="welcome-icon" style={{ width: 120, height: 120, border: '4px solid rgba(255,255,255,0.05)' }}>
+          <MessageCircle size={54} color="white" />
+        </div>
         <div style={{ marginTop: 20 }}>
           <h2 style={{ fontSize: 36, fontWeight: 800, marginBottom: 8, fontFamily: "'Outfit', sans-serif" }}>Welcome, {meUser.name.split(' ')[0]}!</h2>
           <p style={{ fontSize: 16, color: 'var(--text-secondary)', maxWidth: 400, margin: '0 auto' }}>Ready to connect with your world? Start a conversation now.</p>
@@ -1176,12 +1189,19 @@ function WelcomeScreen({ meUser, onNewChat }) {
         </button>
 
         <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', justifyContent: 'center', marginTop: 30 }}>
-          {['🔒 Secured Encryption', '⚡ Fast Delivery', '📡 Real-time Online'].map(f => (
-            <span key={f} style={{
+          {[
+            { icon: <Lock size={14} />, label: 'Secured Encryption' },
+            { icon: <Zap size={14} />, label: 'Fast Delivery' },
+            { icon: <Monitor size={14} />, label: 'Real-time Online' }
+          ].map(f => (
+            <span key={f.label} style={{
               background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)',
               borderRadius: 14, padding: '10px 18px',
-              fontSize: 13, color: 'var(--text-muted)', fontWeight: 600
-            }}>{f}</span>
+              fontSize: 13, color: 'var(--text-muted)', fontWeight: 600,
+              display: 'flex', alignItems: 'center', gap: 8
+            }}>
+              {f.icon} {f.label}
+            </span>
           ))}
         </div>
       </div>
