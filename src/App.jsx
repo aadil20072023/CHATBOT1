@@ -1021,9 +1021,9 @@ function AdminExternalPanel({ currentUserId, onLogout }) {
 
       await emailjs.send(SERVICE_ID, TEMPLATE_ID, templateParams, PUBLIC_KEY);
       setSendSuccess(true);
-      setTimeout(() => setDraftUser(null), 2000); // close modal after 2s
+      setTimeout(() => setDraftUser(null), 2000); 
     } catch (err) {
-      setSendError('Failed to send email. Ensure you have entered your YOUR_SERVICE_ID etc. in the code!');
+      setSendError('Failed to send email. Check your EmailJS configuration.');
       console.error(err);
     } finally {
       setIsSending(false);
@@ -1031,83 +1031,111 @@ function AdminExternalPanel({ currentUserId, onLogout }) {
   };
 
   return (
-    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column', color: 'var(--text-primary)' }}>
-      <header style={{ padding: '20px 40px', background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)' }}>
-        <h1 style={{ margin: 0, fontSize: 24, display: 'flex', alignItems: 'center', gap: 12 }}>🛡️ System Admin Dashboard</h1>
+    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column', color: 'var(--text-primary)', fontFamily: "'Outfit', sans-serif" }}>
+      <header style={{ padding: '24px 60px', background: 'rgba(15, 17, 21, 0.8)', backdropFilter: 'blur(12px)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)', sticky: 'top', zIndex: 100 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+           <div style={{ width: 42, height: 42, background: 'var(--bubble-out)', borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 24, boxShadow: 'var(--shadow-glow)' }}>🛡️</div>
+           <div>
+             <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, letterSpacing: '-0.5px' }}>System Admin</h1>
+             <p style={{ margin: 0, fontSize: 12, color: 'var(--text-muted)', fontWeight: 500 }}>Management Dashboard</p>
+           </div>
+        </div>
         <div style={{ display: 'flex', gap: 16 }}>
-           <button onClick={() => window.location.replace('/CHATBOT1/')} style={{ padding: '10px 20px', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 600 }}>Back to Chatbox</button>
-           <button onClick={onLogout} style={{ padding: '10px 20px', background: '#e74c3c', border: 'none', borderRadius: 8, color: '#fff', cursor: 'pointer', fontWeight: 600 }}>Logout</button>
+           <button onClick={() => window.location.replace('/CHATBOT1/')} style={{ padding: '10px 24px', background: 'var(--bg-tertiary)', border: '1px solid var(--border)', borderRadius: 12, color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 600, fontSize: 14, transition: 'var(--transition)' }}>Back to App</button>
+           <button onClick={onLogout} style={{ padding: '10px 24px', background: 'rgba(231, 76, 60, 0.15)', border: '1px solid rgba(231, 76, 60, 0.3)', borderRadius: 12, color: '#ff6b6b', cursor: 'pointer', fontWeight: 600, fontSize: 14 }}>Logout</button>
         </div>
       </header>
       
-      <main style={{ flex: 1, padding: 40, maxWidth: 900, margin: '0 auto', width: '100%' }}>
-         <div style={{ background: 'var(--bg-tertiary)', borderRadius: 16, border: '1px solid var(--border)', overflow: 'hidden' }}>
-            <div style={{ padding: 24, borderBottom: '1px solid var(--border)', background: 'var(--bg-secondary)' }}>
-               <h2 style={{ margin: 0, fontSize: 20 }}>User Directory</h2>
-               <p style={{ margin: '8px 0 0 0', color: 'var(--text-muted)' }}>Total registered users: {users.length}</p>
+      <main style={{ flex: 1, padding: '60px 20px', maxWidth: 1000, margin: '0 auto', width: '100%' }}>
+         <div style={{ marginBottom: 40, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <div>
+              <h2 style={{ fontSize: 32, fontWeight: 800, margin: 0, letterSpacing: '-1px' }}>User Management</h2>
+              <p style={{ color: 'var(--text-muted)', marginTop: 8 }}>Overview of all registered accounts on the platform</p>
             </div>
-            <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
-               {users.map(u => (
-                 <div key={u.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 16, background: 'var(--bg-hover)', borderRadius: 12 }}>
-                   <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-                      <OnlineAvatar user={u} size={48} />
+            <div style={{ padding: '14px 28px', background: 'var(--bg-tertiary)', borderRadius: 20, border: '1px solid var(--border)', textAlign: 'center' }}>
+               <div style={{ fontSize: 24, fontWeight: 800, color: 'var(--accent-primary)' }}>{users.length}</div>
+               <div style={{ fontSize: 11, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '1px', fontWeight: 600 }}>Total Users</div>
+            </div>
+         </div>
+
+         <div style={{ background: 'var(--bg-tertiary)', borderRadius: 24, border: '1px solid var(--border)', padding: 12, boxShadow: 'var(--shadow-lg)', overflow: 'hidden' }}>
+            <div style={{ height: 60, display: 'flex', alignItems: 'center', padding: '0 24px', borderBottom: '1px solid var(--border)', color: 'var(--text-muted)', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '1px' }}>
+               <div style={{ flex: 2 }}>User Info</div>
+               <div style={{ flex: 1 }}>Status</div>
+               <div style={{ width: 140, textAlign: 'right' }}>Actions</div>
+            </div>
+            
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+               {users.map((u, i) => (
+                 <div key={u.id} className="admin-user-row" style={{ display: 'flex', alignItems: 'center', padding: '20px 24px', borderRadius: 16, transition: 'var(--transition)', borderBottom: i === users.length - 1 ? 'none' : '1px solid var(--border)' }}>
+                    <div style={{ flex: 2, display: 'flex', alignItems: 'center', gap: 16 }}>
+                      <OnlineAvatar user={u} size={50} />
                       <div>
-                        <div style={{ fontWeight: 600, fontSize: 16 }}>{u.name} {u.id === currentUserId ? '(Admin)' : ''}</div>
-                        <div style={{ color: 'var(--text-secondary)', fontSize: 14 }}>{u.email}</div>
+                        <div style={{ fontWeight: 700, fontSize: 16, color: 'var(--text-primary)' }}>{u.name} {u.id === currentUserId ? ' (You)' : ''}</div>
+                        <div style={{ color: 'var(--text-muted)', fontSize: 13, marginTop: 2 }}>{u.email}</div>
                       </div>
-                   </div>
-                   <div style={{ display: 'flex', gap: 10 }}>
-                     <button 
-                       onClick={() => { setDraftUser(u); setSendSuccess(false); setSendError(''); setEmailBody(''); }}
-                       style={{ background: 'var(--accent-primary)', color: '#fff', border: 'none', padding: '8px 16px', borderRadius: 8, fontWeight: 600, fontSize: 14, cursor: 'pointer' }}
-                     >
-                       ✉️ Send Email
-                     </button>
-                   </div>
+                    </div>
+                    <div style={{ flex: 1 }}>
+                       {u.online ? (
+                         <span style={{ color: 'var(--accent-primary)', fontSize: 12, fontWeight: 700, padding: '4px 12px', background: 'var(--accent-glow)', borderRadius: 20 }}>Online</span>
+                       ) : (
+                         <span style={{ color: 'var(--text-muted)', fontSize: 12, fontWeight: 600 }}>Offline</span>
+                       )}
+                    </div>
+                    <div style={{ width: 140, textAlign: 'right' }}>
+                       <button 
+                         onClick={() => { setDraftUser(u); setSendSuccess(false); setSendError(''); setEmailBody(''); }}
+                         style={{ background: 'white', color: 'black', border: 'none', padding: '10px 18px', borderRadius: 12, fontWeight: 700, fontSize: 13, cursor: 'pointer', boxShadow: '0 4px 12px rgba(255,255,255,0.1)' }}
+                       >
+                         Email
+                       </button>
+                    </div>
                  </div>
                ))}
             </div>
          </div>
       </main>
 
-      {/* Email Draft Modal */}
       {draftUser && (
-        <div className="modal-overlay" onClick={(e) => { if (e.target === e.currentTarget) setDraftUser(null); }}>
-          <div className="modal" style={{ maxWidth: 500, width: '100%' }}>
-            <div className="modal-header">
+        <div className="modal-overlay" style={{ background: 'rgba(0,0,0,0.85)', backdropFilter: 'blur(8px)' }} onClick={(e) => { if (e.target === e.currentTarget) setDraftUser(null); }}>
+          <div className="modal" style={{ maxWidth: 540, borderRadius: 28, background: 'var(--bg-tertiary)', border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden' }}>
+            <div className="modal-header" style={{ padding: '30px 40px', border: 'none', background: 'var(--bg-hover)' }}>
+              <div>
+                <span className="modal-title" style={{ fontSize: 24, fontWeight: 800 }}>Draft Email</span>
+                <p style={{ margin: '4px 0 0 0', color: 'var(--text-muted)', fontSize: 14 }}>Sending to {draftUser.name}</p>
+              </div>
               <button className="icon-btn" onClick={() => setDraftUser(null)}>✕</button>
-              <span className="modal-title">Draft Email to {draftUser.name}</span>
             </div>
-            <form className="modal-body" onSubmit={handleSendEmailJS}>
-              <div className="auth-field" style={{ marginBottom: 16 }}>
-                <label className="auth-label">To Email</label>
-                <input className="auth-input" value={draftUser.email} disabled style={{ opacity: 0.7 }} />
+            <form className="modal-body" style={{ padding: '40px' }} onSubmit={handleSendEmailJS}>
+              <div className="auth-field" style={{ marginBottom: 24 }}>
+                <label className="auth-label" style={{ fontWeight: 700, opacity: 0.6 }}>Recipient</label>
+                <input className="auth-input" value={draftUser.email} disabled style={{ background: 'rgba(0,0,0,0.2)', border: 'none', opacity: 0.6 }} />
               </div>
-              <div className="auth-field" style={{ marginBottom: 16 }}>
-                <label className="auth-label">Subject</label>
-                <input className="auth-input" value={emailSubject} onChange={e => setEmailSubject(e.target.value)} required />
+              <div className="auth-field" style={{ marginBottom: 24 }}>
+                <label className="auth-label" style={{ fontWeight: 700 }}>Subject</label>
+                <input className="auth-input" style={{ background: 'var(--bg-hover)', border: '1px solid var(--border)', padding: '16px' }} value={emailSubject} onChange={e => setEmailSubject(e.target.value)} required />
               </div>
-              <div className="auth-field" style={{ marginBottom: 16 }}>
-                <label className="auth-label">Message Body</label>
+              <div className="auth-field" style={{ marginBottom: 30 }}>
+                <label className="auth-label" style={{ fontWeight: 700 }}>Message</label>
                 <textarea 
                   className="auth-input" 
+                  style={{ background: 'var(--bg-hover)', border: '1px solid var(--border)', padding: '16px', borderRadius: 20, resize: 'none' }}
                   value={emailBody} 
                   onChange={e => setEmailBody(e.target.value)} 
                   required 
                   rows={6}
-                  style={{ resize: 'vertical', minHeight: 100, padding: 12 }}
                 />
               </div>
 
-              {sendError && <div className="auth-error" style={{ marginBottom: 16 }}><span>⚠️</span> {sendError}</div>}
-              {sendSuccess && <div style={{ color: 'var(--accent-primary)', padding: 12, background: 'rgba(37,211,102,0.1)', borderRadius: 8, marginBottom: 16, fontWeight: 600 }}>✅ Email sent successfully via EmailJS!</div>}
+              {sendError && <div className="auth-error" style={{ marginBottom: 24 }}><span>⚠️</span> {sendError}</div>}
+              {sendSuccess && <div style={{ color: 'var(--accent-primary)', padding: '16px', background: 'var(--accent-glow)', borderRadius: 16, marginBottom: 24, fontWeight: 700, textAlign: 'center' }}>✅ Email sent successfully!</div>}
 
               <button 
                 type="submit" 
                 disabled={isSending || sendSuccess} 
-                style={{ width: '100%', padding: 14, borderRadius: 8, background: 'var(--accent-primary)', color: '#fff', border: 'none', fontWeight: 600, fontSize: 16, cursor: isSending ? 'not-allowed' : 'pointer', opacity: isSending ? 0.7 : 1 }}
+                style={{ width: '100%', padding: '18px', borderRadius: 16, background: 'var(--bubble-out)', color: '#fff', border: 'none', fontWeight: 800, fontSize: 16, cursor: 'pointer', boxShadow: 'var(--shadow-glow)' }}
               >
-                {isSending ? 'Sending...' : 'Send Delivery Email'}
+                {isSending ? 'Sending...' : 'Send Now'}
               </button>
             </form>
           </div>
@@ -1121,33 +1149,38 @@ function AdminExternalPanel({ currentUserId, onLogout }) {
 // ─── Welcome ──────────────────────────────────────────────────────────────────
 function WelcomeScreen({ meUser, onNewChat }) {
   return (
-    <div className="chat-area">
-      <div className="welcome-screen">
-        <div className="welcome-icon">💬</div>
-        <h2>Welcome, {meUser.name.split(' ')[0]}! 👋</h2>
-        <p>Select a conversation or start a new chat to get talking.</p>
-        <div className="welcome-dots">
+    <div className="chat-area" style={{ background: 'radial-gradient(circle at center, var(--bg-hover) 0%, var(--bg-primary) 100%)' }}>
+      <div className="welcome-screen" style={{ padding: '60px' }}>
+        <div className="welcome-icon" style={{ width: 120, height: 120, fontSize: 54, border: '4px solid rgba(255,255,255,0.05)' }}>💬</div>
+        <div style={{ marginTop: 20 }}>
+          <h2 style={{ fontSize: 36, fontWeight: 800, marginBottom: 8, fontFamily: "'Outfit', sans-serif" }}>Welcome, {meUser.name.split(' ')[0]}!</h2>
+          <p style={{ fontSize: 16, color: 'var(--text-secondary)', maxWidth: 400, margin: '0 auto' }}>Ready to connect with your world? Start a conversation now.</p>
+        </div>
+        
+        <div className="welcome-dots" style={{ margin: '20px 0' }}>
           <div className="welcome-dot" /><div className="welcome-dot" /><div className="welcome-dot" />
         </div>
+
         <button
           onClick={onNewChat}
           style={{
-            marginTop: 16, padding: '12px 28px', borderRadius: 'var(--radius-full)',
-            background: 'linear-gradient(135deg, var(--accent-primary), var(--accent-secondary))',
-            border: 'none', color: '#fff', fontSize: 14, fontWeight: 600,
-            fontFamily: 'inherit', cursor: 'pointer', boxShadow: '0 4px 16px rgba(37,211,102,0.3)',
-            transition: 'all 0.2s'
+            marginTop: 10, padding: '18px 42px', borderRadius: 20,
+            background: 'var(--bubble-out)',
+            border: 'none', color: '#fff', fontSize: 16, fontWeight: 800,
+            fontFamily: "'Outfit', sans-serif", cursor: 'pointer', boxShadow: 'var(--shadow-glow)',
+            transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)'
           }}
-          id="start-new-chat-btn"
+          className="welcome-primary-btn"
         >
-          ✏️ Start a New Chat
+          Start New Chat
         </button>
-        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center', marginTop: 4 }}>
-          {['🔒 End-to-end encrypted', '⚡ Real-time updates', '🌐 Browser-based'].map(f => (
+
+        <div style={{ display: 'flex', gap: 14, flexWrap: 'wrap', justifyContent: 'center', marginTop: 30 }}>
+          {['🔒 Secured Encryption', '⚡ Fast Delivery', '📡 Real-time Online'].map(f => (
             <span key={f} style={{
-              background: 'var(--bg-tertiary)', border: '1px solid var(--border)',
-              borderRadius: 'var(--radius-full)', padding: '6px 14px',
-              fontSize: 12, color: 'var(--text-secondary)'
+              background: 'rgba(255,255,255,0.03)', border: '1px solid var(--border)',
+              borderRadius: 14, padding: '10px 18px',
+              fontSize: 13, color: 'var(--text-muted)', fontWeight: 600
             }}>{f}</span>
           ))}
         </div>
