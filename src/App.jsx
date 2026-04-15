@@ -919,13 +919,13 @@ function Sidebar({ meUser, conversations, activeConvId, onSelect, onNewChat, onL
 
       {/* Tabs */}
       <div className="sidebar-tabs">
-        {(window.location.hash === '#admin' || window.location.search.includes('admin=true') ? ['Chats', 'Status', 'Calls', 'Admin'] : ['Chats', 'Status', 'Calls']).map(t => (
+        {['Chats', 'Status', 'Calls'].map(t => (
           <button
             key={t}
             className={`tab-btn ${finalTab === t ? 'active' : ''}`}
             onClick={() => setTab(t)}
           >
-            {t === 'Chats' && '💬 '}{t === 'Status' && '🟢 '}{t === 'Calls' && '📞 '}{t === 'Admin' && '🛡️ '}{t}
+            {t === 'Chats' && '💬 '}{t === 'Status' && '🟢 '}{t === 'Calls' && '📞 '}{t}
           </button>
         ))}
       </div>
@@ -981,19 +981,13 @@ function Sidebar({ meUser, conversations, activeConvId, onSelect, onNewChat, onL
             <p>Call history coming soon</p>
           </div>
         )}
-        {finalTab === 'Admin' && (
-          <div style={{ padding: 20, textAlign: 'center', color: 'var(--text-muted)', fontSize: 13, display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center', marginTop: 40 }}>
-            <div style={{ fontSize: 40 }}>🛡️</div>
-            <p>Select the Admin tab to view the user directory.</p>
-          </div>
-        )}
       </div>
     </div>
   );
 }
 
-// ─── Admin Panel ──────────────────────────────────────────────────────────────
-function AdminPanel({ currentUserId, onStartChat, onClose }) {
+// ─── External Admin Dashboard ────────────────────────────────────────────────────────
+function AdminExternalPanel({ currentUserId, onLogout }) {
   const [users, setUsers] = useState([]);
   
   useEffect(() => {
@@ -1001,35 +995,48 @@ function AdminPanel({ currentUserId, onStartChat, onClose }) {
   }, []);
 
   return (
-    <div className="chat-area" style={{ background: 'var(--bg-secondary)', display: 'flex', flexDirection: 'column' }}>
-      <div className="chat-header" style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg-tertiary)' }}>
-        <h2 style={{ fontSize: 18, margin: 0 }}>🛡️ Admin Directory</h2>
-        <button onClick={onClose} className="icon-btn">✕</button>
-      </div>
-      <div style={{ flex: 1, overflowY: 'auto', padding: 20 }}>
-        <div style={{ maxWidth: 600, margin: '0 auto' }}>
-           <h3 style={{ color: 'var(--text-muted)', fontSize: 14, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 16, paddingLeft: 8 }}>Total Users: {users.length}</h3>
-           {users.map(u => (
-             <div key={u.id} className="chat-item" style={{ borderRadius: 12, marginBottom: 8, padding: '12px 16px', background: 'var(--bg-tertiary)' }} onClick={() => u.id !== currentUserId && onStartChat(u)}>
-               <div style={{ padding: 3 }}>
-                 <OnlineAvatar user={u} size={42} />
-               </div>
-               <div className="chat-body" style={{ paddingLeft: 16, display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                 <div>
-                   <div className="chat-name">{u.name} {u.id === currentUserId ? '(You)' : ''}</div>
-                   <div className="chat-preview">{u.email}</div>
-                 </div>
-                 {u.id !== currentUserId && (
-                   <button style={{ background: 'var(--accent-primary)', color: '#fff', border: 'none', borderRadius: 16, padding: '6px 12px', fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>Message</button>
-                 )}
-               </div>
-             </div>
-           ))}
+    <div style={{ minHeight: '100vh', background: 'var(--bg-primary)', display: 'flex', flexDirection: 'column', color: 'var(--text-primary)' }}>
+      <header style={{ padding: '20px 40px', background: 'var(--bg-tertiary)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid var(--border)' }}>
+        <h1 style={{ margin: 0, fontSize: 24, display: 'flex', alignItems: 'center', gap: 12 }}>🛡️ System Admin Dashboard</h1>
+        <div style={{ display: 'flex', gap: 16 }}>
+           <button onClick={() => window.location.replace('/CHATBOT1/')} style={{ padding: '10px 20px', background: 'var(--bg-secondary)', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text-primary)', cursor: 'pointer', fontWeight: 600 }}>Back to Chatbox</button>
+           <button onClick={onLogout} style={{ padding: '10px 20px', background: '#e74c3c', border: 'none', borderRadius: 8, color: '#fff', cursor: 'pointer', fontWeight: 600 }}>Logout</button>
         </div>
-      </div>
+      </header>
+      
+      <main style={{ flex: 1, padding: 40, maxWidth: 900, margin: '0 auto', width: '100%' }}>
+         <div style={{ background: 'var(--bg-tertiary)', borderRadius: 16, border: '1px solid var(--border)', overflow: 'hidden' }}>
+            <div style={{ padding: 24, borderBottom: '1px solid var(--border)', background: 'var(--bg-secondary)' }}>
+               <h2 style={{ margin: 0, fontSize: 20 }}>User Directory</h2>
+               <p style={{ margin: '8px 0 0 0', color: 'var(--text-muted)' }}>Total registered users: {users.length}</p>
+            </div>
+            <div style={{ padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+               {users.map(u => (
+                 <div key={u.id} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 16, background: 'var(--bg-hover)', borderRadius: 12 }}>
+                   <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+                      <OnlineAvatar user={u} size={48} />
+                      <div>
+                        <div style={{ fontWeight: 600, fontSize: 16 }}>{u.name} {u.id === currentUserId ? '(Admin)' : ''}</div>
+                        <div style={{ color: 'var(--text-secondary)', fontSize: 14 }}>{u.email}</div>
+                      </div>
+                   </div>
+                   <div style={{ display: 'flex', gap: 10 }}>
+                     <a 
+                       href={`mailto:${u.email}?subject=Message from ChatterBox Admin`} 
+                       style={{ background: 'var(--accent-primary)', color: '#fff', textDecoration: 'none', padding: '8px 16px', borderRadius: 8, fontWeight: 600, fontSize: 14 }}
+                     >
+                       ✉️ Send Email
+                     </a>
+                   </div>
+                 </div>
+               ))}
+            </div>
+         </div>
+      </main>
     </div>
   );
 }
+
 
 // ─── Welcome ──────────────────────────────────────────────────────────────────
 function WelcomeScreen({ meUser, onNewChat }) {
@@ -1138,6 +1145,10 @@ export default function App() {
     return <AuthPage onAuth={handleAuth} />;
   }
 
+  if (window.location.hash === '#admin' || window.location.search.includes('admin=true')) {
+    return <AdminExternalPanel currentUserId={meUser.id} onLogout={handleLogout} />;
+  }
+
   return (
     <div className="app-container">
       <Sidebar
@@ -1158,12 +1169,6 @@ export default function App() {
           meUser={meUser} 
           onClose={() => setActiveTab('Chats')} 
           onAddStatus={handleAddStatus}
-        />
-      ) : activeTab === 'Admin' ? (
-        <AdminPanel 
-          currentUserId={meUser.id} 
-          onStartChat={handleStartChat} 
-          onClose={() => setActiveTab('Chats')} 
         />
       ) : activeConv ? (
         <ChatArea
