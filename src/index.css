@@ -327,7 +327,7 @@ body {
     border-top: 1px solid var(--border);
     border-bottom: none;
     padding-bottom: env(safe-area-inset-bottom);
-    z-index: 1000;
+    z-index: 2000;
   }
   .chat-list {
     margin-bottom: 70px;
@@ -507,11 +507,15 @@ body {
 @media (max-width: 768px) {
   .chat-area {
     position: absolute;
-    inset: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0; /* Changed to full by default, but content will have padding */
     z-index: 200;
     display: flex !important;
     flex-direction: column !important;
     background: var(--bg-primary);
+    padding-bottom: 70px; /* Room for mobile bottom tabs */
   }
   .chat-area.hidden {
     display: none !important;
